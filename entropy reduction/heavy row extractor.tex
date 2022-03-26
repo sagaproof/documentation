@@ -1,0 +1,389 @@
+
+\begin{define}
+    \newcommand\Sample{\mathtt{Sample}}
+    \newcommand\Check{\mathtt{Check}}
+    \newcommand\Chall{\mathtt{Chall}}
+    \newcommand\Resp{\mathtt{Resp}}
+    \newcommand\chall{\mathtt{chall}}
+    \newcommand\resp{\mathtt{resp}}
+\end{define}
+
+This page presents the construction and analysis for a knowledge extractor that is to be used as a subroutine by some other extractor.
+It extracts two solutions related in a particular way, which is of use to the calling-extractor.
+The construction comes from \cite{Dam10} where it is used in the discrete log setting.
+The required expected running time of the extractor is taken from the definition of `proof of knowledge' proposed in \cite{BG92}, which has become a rather standard definition.
+
+The definition of \cite{BG92} emphasizes that the extractor's black-box access to the prover allows nothing more than feeding the prover challenges.
+In particular, the extractor cannot choose or even see the random coins of the prover.
+In order to extract two related solutions, however, we must assume a slightly stronger notion of extraction in which the extractor is able to re-run the prover on the same random coins as in the immediately previous execution, still never seeing the coins.
+Avoiding this extra assumption is probably impossible for our purposes, yet our extractor is probably the first to avoid the assumption for all but the smallest values of $\epsilon$, which is the probability the prover convinces the verifier.
+
+
+\begin{references}
+    \source{Dam10}
+    \title{On Σ-protocols}
+    \authors{Ivan Damgard}
+    \when{2010}
+    \where{}
+    \other
+    \link{cs.au.dk/~ivan/Sigma.pdf}
+\end{references}
+
+\begin{theorem}{Heavy Row Extractor}
+    The heavy row extractor $HRE(\mathcal{P},\Sample,\Check)$ is a sub-extractor to be used by other extractors.
+    It serves the purpose of extracting two related solutions, which the calling-extractor can then use as it pleases.
+    The heavy row extractor is parameterized by a prover $\mathcal{P}$, a helper function to sample challenges, and a helper function to check whether a response from the prover is valid with respect to a particular challenge.
+    In more detail, the heavy row extractor is parameterized as follows.
+    \begin{enumerate}
+        \item
+        Let $\Chall$ be the set of possible challenges, $\Resp$ the set of possible responses, and $R$ a power of 2.
+        The prover $\mathcal{P}\colon\Chall\times\{0,1\}^{\log_2(R)}\to\Resp$ is a probabilistic algorithm using $\log_2(R)$ coins that maps challenges to responses.
+        While the prover takes both challenges and coins as inputs, when invoking the prover the extractor cannot see the random coins, much less choose them.
+        The extractor can, however, request that the prover use the same coins as in the immediately previous invocation.
+
+        \item
+        The helper function $\Sample\colon[M]\times[N]\to\Chall$ is used to sample challenges, where $M$ and $N$ are positive integers.
+        Sampling done this way, rather than directly from $\Chall$, allows the heavy row extractor to sample related challenges.
+        Thinking of the challenges as the cells of an $M\times N$ table, two challenges are related if they are in the same row.
+        The goal of the heavy row extractor is to find two related challenges on which the prover succeeds.
+
+        \item
+        The helper function $\Check\colon\Chall\times\Resp\to\{\text{true},\text{false}\}$ is used to check responses issued \emph{from} the prover against challenges issued \emph{to} the prover.
+    \end{enumerate}
+
+    Suppose with probability $\epsilon > 1/N$ over $i\in[M]$, $j\in[N]$, $r\in[R]$, the prover on challenge $\chall=\Sample(i,j)$ using random coins corresponding to $r$ (the binary representation of $R$) is able to output a response $\resp$ such that $\Check(\chall,\resp)$ is true.
+    More succinctly, suppose
+    \begin{equation}
+        \text{Pr}\left[
+            \begin{array}{c}
+                & i\in M & \\
+                & j\in N & \\
+                & r\in R &
+            \end{array}
+            \middle|
+            \begin{array}{c}
+                & \chall = \Sample(i,j) & \\
+                & \resp = \mathcal{P}(\chall,\text{BD}(r)) & \\
+                & \Check(\chall,\resp) = \text{true} &
+            \end{array}
+        \right] = \epsilon > 1/N
+    \end{equation}
+    where $\text{BD}$ denotes binary decomposition.
+    Then there exists an extractor that given access to prover $\mathcal{P}$ outputs $\{(\chall,\resp),(\chall',\resp')\}\subseteq\Chall\times\Resp$ such that there exist $i\in[M]$ and $j,j'\in[N]$ with $j\neq j'$ satisfying
+    \begin{gathered}
+        \chall = \Sample(i,j),\ \chall' = \Sample(i,j'), \\
+        \Check(\chall,\resp) = \Check(\chall',\resp') = \text{true}
+    \end{gathered}
+    Moreover, the extractor runs in expected time
+    \begin{equation}
+        \frac{\mathcal{O}(1)}{\epsilon - 1/N}
+    \end{equation}
+
+    \proof
+    We prove the theorem by constructing such an extractor in the sections that follow.
+
+\end{theorem}
+
+\section{Extractor overview}
+
+The extractor actually consists of two separate extractors that run in parallel.
+We construct and analyze each extractor separately.
+Each is responsible for extracting solutions for separate ranges of $\epsilon$.
+Since the value $\epsilon$ is unknown, the two extractors must run in parallel until one outputs a solution.
+The range of $\epsilon$ is $(1/N,1]$.
+We split this range in two, parameterized by some constant $\kappa > 2$.
+The first extractor, presented in the first section below, is responsible for extracting solutions when $1/N < \epsilon < \kappa/N$.
+The second extractor, presented in the second section below, is responsible for extracting solutions when $\kappa/N \leq \epsilon \leq 1$.
+
+In both sections that follow we use a truth table $\mathcal{T}$ with rows and columns indexed by all possible challenges and random coins.
+A table cell contains the value true if and only if the prover succeeds for the corresponding challenge when using the corresponding coins.
+With the first extractor, the rows are indexed by $M\times R$ and the columns by $N$, and the cells filled with their naturally corresponding truth values.
+With the second extractor, the rows are instead indexed by $M$ and the columns by $N\times R$.
+In both cases, the extractor must find two true cells in the same row.
+In the first case, both true cells correspond to the same randomness.
+Then in order to search a row, the prover's randomness cannot change.
+This is why we must allow the extractor to re-run the prover on the same random coins.
+In the second case, two true cells may correspond to different randomness, and there is no need re-run the prover on the same randomness.
+
+Before we describe the construction of the extractor, we clarify the distinction between the construction and it's analysis.
+The tables $\mathcal{T}$ in the two sections that follow are fictional and purely for analysis.
+Out of convenience we will speak of the extractor sampling table cells.
+In the construction, however, the extractor is limited to sampling challenges.
+We now clarify why sampling challenges and sampling table cells are equivalent.
+By sampling a table cell $((i,r),j)$ or $(i,(j,r))$ we mean the extractor samples $i\in[M]$ and $j\in[N]$, obtains the prover's response $\resp$ on challenge $\chall = \Sample(i,j)$ when using random coins corresponding to $r$, and finally outputs truth value $\Check(\chall,\resp)$.
+The prover's success on challenge $\Sample(i,j)$ using random coins corresponding to $r$ is exactly the truth value in the cells $((i,r),j)$ and $(i,(j,r))$.
+The only cause for doubt is the extractor doesn't sample random coins and yet must sample a cell corresponding to random coins.
+The extractor knows nothing of the random coins, or even how many coins the prover uses ($\log_2(R)$).
+A random sequence of $\log_2(R)$ coins is fed to the prover along with each challenge nonetheless.
+Sampling a random challenge, feeding it to the prover, then checking the response, is therefore equivalent to sampling a random table cell.
+
+
+\section[When epsilon lt kappa/N]{When $\epsilon < \kappa/N$}
+
+Consider a table $\mathcal{T}$ of truth values with $MR$ rows and $N$ columns.
+Cell $((i,r),j)$ for $i\in[M], r\in[R], j\in[N]$ corresponds to challenge $\Sample(i,j)$ and reflects the prover's success on the challenge using random coins corresponding to $r$.
+Recall that our goal is to find two different challenges $\Sample(i,j)$ and $\Sample(i,j')$ on which the prover succeeds.
+This is equivalent to finding two true cells in the same row $(i,r)$ and in different columns $j$ and $j'$.
+We define a row as \bold{heavy} if it contains at least 2 true cells.
+
+Suppose we write $\epsilon$ as
+\begin{equation}
+    \epsilon = \frac{1}{N} + \frac{\delta}{(MR)N}
+\end{equation}
+Since $\epsilon > 1/N$ and $\epsilon$ is some rational with denominator at most $(MR)N$ (the size of $\mathcal{T}$), we must have $\delta$ a whole number greater than 1.
+There are a total of $\epsilon (MR)N = MR + \delta$ true cells in the table.
+Since there are $MR$ rows, at least $\delta$ of these true cells must be located in rows along with at least one other true cell.
+That is, at least $\delta$ true cells are located in heavy rows.
+
+The extractor operates by querying random table cells until encountering a true cell.
+The extractor then searches through the entire corresponding row hoping to find a second true cell (which will occur if and only if the row is heavy).
+The extractor repeats the process until succeeding.
+More formally, the extractor repeats the following subroutine until succeeding.
+\begin{enumerate}
+    \item
+    Sample random $i\in[M]$ and $j\in[N]$.
+    Obtain response $\resp$ by querying the prover on challenge $\chall=\Sample(i,j)$.
+    If $\Check(\chall,\resp)$ is true, continue to the next step, otherwise repeat this step.
+
+    \item
+    For every $j'\in[N]$ with $j'\neq j$, do the following.
+    Obtain response $\resp'$ by querying the prover on challenge $\chall'=\Sample(i,j')$.
+    If $\Check(\chall',\resp')$ is true, return solutions $\{(\chall,\resp),(\chall',\resp')\}$.
+    If all $j'\in N$ fail to yield a solution, exit with failure.
+\end{enumerate}
+
+It should be clear that repeating the subroutine will yield a solution after sufficient repetitions.
+We are left to analyze the running time of the extractor, that is the running time of the subroutine and how many times it must execute.
+Before calculating the total time for the extractor, we lower bound the expected number of times the subroutine must execute.
+Each execution of the subroutine coincides with finding a true cell and then searching the entire corresponding row.
+The probability a given execution succeeds is then the probability a true cell is in a heavy row, which is at least $\delta/(MR+\delta)$.
+We invert this probability to get the expected number of times the subroutine must execute, that is $(MR+\delta)/\delta$.
+
+The total time of the extractor is the time for the first step, plus the time for the second step, multiplied by the number of times the subroutine executes.
+The first step takes expected time $1/\epsilon$ since the prover succeeds with probability $\epsilon$ when invoked on a random challenge.
+The second step takes time $N$, so the subroutine takes expected time
+\begin{equation}
+    \frac{1}{\epsilon} + N = \frac{MRN}{MR+\delta} + N
+\end{equation}
+The subroutine executes an expected $(MR+\delta)/\delta$ times as established previously.
+Therefore the extractor's total expected time is
+\begin{equation}
+    \left(\frac{MRN}{MR+\delta} + N\right)\frac{MR+\delta}{\delta}
+    = \frac{MRN + (MR + \delta)N}{\delta}
+\end{equation}
+
+We'd like to show that the extractor's expected time is no more than allowed.
+First, we take note that the time allowed is
+\begin{equation}
+    \frac{\mathcal{O}(1)}{\epsilon - 1/N}
+    = \frac{\mathcal{O}(1)}{1/N + \delta/MRN - 1/N}
+    = \frac{\mathcal{O}(MRN)}{\delta}
+\end{equation}
+Second, we upper bound $\delta$ as
+\begin{equation}
+    \epsilon = \frac{1}{N} + \frac{\delta}{MRN} < \frac{\kappa}{N}
+    \implies
+    \delta < MR(\kappa - 1)
+\end{equation}
+Returning to the extractor's expected time, we substitute for $\delta$ in the numerator to get
+\begin{equation}
+    \frac{MRN + \kappa MRN}{\delta}
+    = \frac{MRN(\kappa+1)}{\delta}
+    = \frac{\mathcal{O}(MRN)}{\delta}
+\end{equation}
+which is the time allowed as just established.
+This completes the proof for the case $\epsilon < \kappa/N$.
+
+
+\section[When epsilon geq kappa/N)]{When $\epsilon \geq \kappa/N$}
+
+We first present a lemma that plays a core role in analysis.
+After presenting the construction of the extractor, we analyze its correctness and expected running time.
+The extractor consists of repeating a subroutine as many times as necessary to succeed.
+We will show the subroutine takes expected time $\mathcal{O}(1/\epsilon)$, and that is succeeds with probability bounded above by some constant.
+The subroutine must then only be executed an expected constant number of times to succeed, thus preserving the expected time $\mathcal{O}(1/\epsilon)$.
+Note that time $\mathcal{O}(1/\epsilon)$ is less than the time $\mathcal{O}(1)/(\epsilon-1/N)$ that we are allowed.
+
+
+\subsection{Heavy Row Lemma}
+
+Our analysis will center around the following lemma which generalizes that from \cite{Dam10} beyond the special case of $t=1/2$.
+
+\begin{lemma}{Heavy Row Lemma}
+    Consider a table $\mathcal{T}$ of truth values, with $m$ rows and $n$ columns.
+    Suppose $\mathcal{T}$ contains at least an $\epsilon$ fraction of true cells, that is at least $\epsilon mn$ true cells.
+    Furthermore, suppose $1/\epsilon$ divides $mn$ such that $\epsilon mn$ is a whole number.
+
+    For $t\in[0,1]$, define the \bold{heavy} rows of $\mathcal{T}$ to be those containing at least an $\epsilon t$ fraction of true cells, that is at least $\floor{\epsilon tn}$ true cells.
+    Then at least a $1-t$ fraction of all true cells, that is at least $\floor{(1-t)\epsilon mn}$ true cells, are located in heavy rows. 
+
+    \proof
+    Let $\alpha$ be the number of true cells in heavy rows, and $\beta$ the number of true cells in non-heavy rows, noting $\alpha+\beta=\epsilon mn$.
+    By definition, every non-heavy row contains no more than $\floor{\epsilon tn}$ true cells. (Though we can bound the fractional value as strictly less than $\epsilon tn$, we cannot do so for the floored value.)
+    Summing over all $m'\geq 0$ non-heavy rows we have $\beta \leq m'\floor{\epsilon tn} \leq \epsilon tmn$.
+    Then we have a lower bound on $\alpha$ as
+    \begin{equation}
+        \alpha = \epsilon mn - \beta \geq \epsilon mn - \epsilon tmn = \epsilon mn(1-t)
+    \end{equation}
+    Therefore the fraction of true cells located in heavy rows is $\alpha/\epsilon mn \geq 1-t$.
+\end{lemma}
+
+Consider a table $\mathcal{T}$ of truth values with $M$ rows and $NR$ columns.
+Cell $(i,(j,r))$ for $i\in[M], j\in[N], r\in[R]$ corresponds to challenge $\Sample(i,j)$ and reflects the prover's success on the challenge using random coins corresponding to $r$.
+Recall that our goal is to find two different challenges $\Sample(i,j)$ and $\Sample(i,j')$ on which the prover succeeds.
+This is equivalent to finding two true cells in the same row $i$ and in different columns $(j,k)$ and $(j',k')$ conditioned on $j\neq j'$.
+For two such cells to necessarily exist in a row, the row must contain more than $R$ true cells, or else all true cells might be concentrated in columns corresponding to the same challenge.
+
+In order to apply the heavy row lemma to this table, we must consider what it means for a row to be heavy.
+That is, if a heavy row has at least an $\epsilon t$ fraction of true cells, how must we constrain $t$?
+We'd like to define heavy rows as those in which we have a good chance of finding two appropriate true cells.
+As just noted, to guarantee a heavy row contains at least two true cells corresponding to different challenges, a heavy row must contain strictly more than $R$ true cells.
+Therefore the number of true cells in a heavy row must be at least $R+1$.
+We must then constrain $t$ with $\epsilon t \geq (R+1)/NR$.
+The right hand side assumes its maximum at $R=1$, reflecting the case that the prover is deterministic, which is often the case for honest provers.
+With $R \geq 1$ we reduce the constraint to $\epsilon t \geq 2/N$.
+\bold{Heavy} rows are then defined to be those containing at least an $\epsilon t \geq 2/N$ fraction of true cells.
+
+
+\subsection{Extractor Construction}
+
+The extractor will operate by repeating a subroutine as many times as needed to succeed.
+The subroutine will operate roughly as follows.
+Sample random table cells until landing on a true cell.
+Then sample other cells in the same row for a certain amount of time, such that if the row is heavy we have noticeable probability of finding an appropriate second true cell, yet if the row is not heavy we don't squander too much time searching.
+We repeat this two step process until succeeding.
+As for how long to search a row before aborting, the time should be proportional to $1/\epsilon$.
+The smaller the probability we succeed, the longer we are allowed to search.
+Thus we would like to sample about $\delta/\epsilon$ times for some constant $\delta$ to be chosen later.
+But the value $\epsilon$ is unknown to the extractor, so we cannot compute $\delta/\epsilon$ directly.
+Instead, we will approximate $1/\epsilon$ by sampling random table cells, and from that approximate $\delta/\epsilon$.
+
+More formally, our subroutine operates as follows.
+\begin{enumerate}
+    \item
+    Sample random $i\in[M]$ and $j\in[N]$.
+    Obtain response $\resp$ by querying the prover on challenge $\chall=\Sample(i,j)$.
+    If $\Check(\chall,\resp)$ is true, continue to the next step, otherwise repeat this step.
+
+    \item
+    Throw a coin that lands heads with probability $1/\delta$ (e.g. a $\delta$-sided die).
+    Sample a random table cell (as done in the first step).
+    If the coin is heads and the cell is true, abort the subroutine.
+
+    \item
+    Sample random $j'\in[N]$ with $j'\neq j$.
+    Obtain response $\resp'$ by querying the prover on challenge $\chall'=\Sample(i,j')$.
+    If $\Check(\chall',\resp')$ is true, return solution $\{(\chall,\resp),(\chall',\resp')\}$.
+    Otherwise, return to the previous step.
+\end{enumerate}
+
+
+\subsection{Running Time}
+
+The subroutine operates in expected time $\bigO(1/\epsilon)$.
+The first step takes expected time $1/\epsilon$ since the prover succeeds with probability $\epsilon$ when invoked on a random challenge. 
+The second and third steps each take constant time, and are executed an expected $\delta/\epsilon$ number of times, since the event the coin turns heads and the random table cell is true occurs with probability $1/\delta\times\epsilon$.
+Therefore the subroutine takes expected time $(1+\delta)/\epsilon$ = $\bigO(1/\epsilon)$
+
+In the next subsection we will prove the subroutine succeeds with no less than constant probability.
+Therefore, the subroutine need only be run an expected constant number of times (the reciprocal of the success probability) to succeed.
+Thus the extractor's expected running time is $\bigO(1/\epsilon)$.
+
+
+\subsection{Subroutine Success}
+
+We now prove the subroutine succeeds with probability bounded below by some constant.
+To do so we lower bound the probability of each of the following three events.
+\begin{itemize}
+    \item
+    In the first step, upon finding a true cell, that true cell is located in a heavy row.
+    \item
+    The third step is executed at least $\delta/\epsilon$ times. That is, the second step doesn't abort for at least $\delta/\epsilon$ executions.
+    \item
+    In the case we are located in a heavy row, the third step succeeds in finding an appropriate second true cell after no more than $\delta/\epsilon$ executions.
+\end{itemize}
+If all three events occur, the subroutine succeeds.
+Therefore the product of these probabilities lower bounds the probability the subroutine succeeds.
+
+\begin{itemize}
+    \item
+    First we lower bound the probability we land in a heavy row.
+    Recall we \link[previously]{#Heavy-Row-Lemma} defined the heavy rows of $\mathcal{T}$ to be those with at least an $\epsilon t \geq 2/N$ fraction of true cells.
+    Also recall that we've chosen to assume $\epsilon \geq \kappa/N$ for some constant $\kappa > 2$.
+    Multiplying both sides of the latter inequality by $t$ and comparing with the former, one can see we must have $t\kappa/N \geq 2/N$.
+    Thus our constraint on $t$ becomes $t \geq 2/\kappa$.
+
+    The heavy row lemma asserts that at least a $1-t$ fraction of all true cells are located in heavy rows.
+    To ensure this fraction is non-zero, will must choose $t$ as some constant in the interval $[2/\kappa,1)$.
+    Upon sampling a random table cell, we will land in a heavy row with probability at least $1-t > 0$.
+    The constant $t$ will be chosen later.
+
+    \item
+    Second we must lower bound the probability the third step executes at least $\delta/\epsilon$ times.
+    To do so we lower bound the probability the second step executes at least $\delta/\epsilon$ times before aborting.
+    The coin lands heads with probability $1/\delta$, while the random cell is true with probability $\epsilon$.
+    Both events occur with probability $\epsilon/\delta$, so the probability neither event occurs in the first $\delta/\epsilon$ executions is $(1-\epsilon/\delta)^{\delta/\epsilon}$.
+    Comparing with the function $(1-\gamma)^{1/\gamma}$ for $\gamma$ in $[0,1]$, we observe this expression is a decreasing function of $\epsilon$ with minimum value zero at $\epsilon = \delta$.
+    Therefore the expression is positive for all $\epsilon < \delta$.
+    Since $\epsilon$ is at most $1$, we must constrain $\delta > 1$.
+    The minimum value of this expression (at $\epsilon = 1$) is then $(1-1/\delta)^\delta$.
+
+    \item
+    Third we will lower bound the probability the third step succeeds within $\delta/\epsilon$ executions assuming the true cell found in the first step is located in a heavy row.
+    There are at least $\epsilon tNR-1 \geq (R+1)-1 = R$ true cells remaining in the heavy row, but $R-1$ of them may correspond to the same randomness as the first true cell and therefore be inappropriate.
+    There are thus at least $\epsilon tNR-R \geq 1$ appropriate true cells remaining in the heavy row.
+    Each time the third step samples a cell, the probability it is an appropriate second cell is at least
+    \begin{equation}
+        \frac{\epsilon tNR-R}{NR} = \epsilon t - \frac{1}{N}
+        \geq \epsilon t - \frac{\epsilon}{\kappa} = \epsilon(t-1/\kappa)
+    \end{equation}
+    where the inequality follows from the assumption $\epsilon \geq \kappa/N$.
+    To lower bound the probability the third step succeeds within $\delta/\epsilon$ executions, we instead upper bound the probability of the complement, that is the probability of failing at least $\delta/\epsilon$ times which may be written as
+    \begin{equation}
+        \left(1 - \epsilon\left(t-\frac{1}{\kappa}\right)\right)^{\delta/\epsilon}
+    \end{equation}
+    Rewriting $\delta/\epsilon$ as $1/\epsilon(t-1/\kappa) \times \delta(t-1/\kappa)$, and taking advantage of the identity
+    \begin{equation}
+        (1-\gamma)^{1/\gamma} \leq 1/e \text{ for } \gamma\in[0,1]
+    \end{equation}
+    we rewrite this upper bound as
+    \begin{equation}
+        \left(1 - \epsilon\left(t-\frac{1}{\kappa}\right)\right)^{\delta/\epsilon}
+        = \left[\left(1 - \epsilon\left(t-\frac{1}{\kappa}\right)\right)^{1/\epsilon(t-1/\kappa)}\right]^{\delta(t-1/\kappa)}
+        \leq \frac{1}{e^{\delta(t-1/\kappa)}}
+    \end{equation}
+    A second appropriate true cell is then found with probability at least
+    \begin{equation}
+        1 - \frac{1}{e^{\delta(t-1/\kappa)}}
+    \end{equation}
+\end{itemize}
+
+Finally we take the product of the three lower bounds established above to lower bound the probability the subroutine succeeds.
+\begin{equation}
+    (1-t)
+    \left(1-\frac{1}{\delta}\right)^\delta
+    \left(1 - \frac{1}{e^{\delta(t-1/\kappa)}}\right)
+\end{equation}
+To ensure this probability is positive we ensure each component is positive.
+\begin{itemize}
+    \item
+    $1-t > 0$ as long as $t < 1$
+    \item
+    $(1-1/\delta)^\delta > 0$ as long as $\delta > 1$
+    \item
+    $\left(1 - 1/e^{\delta(t-1/\kappa)}\right) > 0$ as long as $\delta(t-1/\kappa) > 0$, that is $t\kappa > 1$.
+\end{itemize}
+By choosing $\delta > 1$ and $t$ in $[2/\kappa,1)$ all three conditions are satisfied.
+We lastly give three examples of parameter instantiations, differing by small, medium, and large $\kappa$ values.
+\begin{itemize}
+    \item
+    With $\kappa = 2.1$, $\delta = 8$ and $t = 0.955$, the subroutine succeeds with probability more than $0.015$, so less than $67$ repetitions are expected.
+
+    \item
+    With $\kappa=4$, $\delta=2$ and $t = 0.5$, the subroutine succeeds with probability more than $0.065$, so less than $16$ repetitions are expected.
+
+    \item
+    With $\kappa = 7$, $\delta = 4$ and $t = 0.35$, the subroutine succeeds with probability more than $0.143$, so less than $7$ repetitions are expected.
+\end{itemize}
+
+This completes the proof for the case $\epsilon \geq \kappa/N$.
