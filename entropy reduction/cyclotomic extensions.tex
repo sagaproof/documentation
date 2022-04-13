@@ -1,0 +1,424 @@
+
+\begin{define}
+    \newcommand\ord{\text{ord}}
+    \newcommand\Gal{\text{Gal}}
+\end{define}
+
+We introduce cyclotomic extensions and examine the special cases of extending $\Q$ and $\F_q$, the two most common base fields for such extensions.
+We also introduce cyclotomic polynomials and explore some basic properties relevant to cyclotomic extensions.
+Two general sources used but not cited elsewhere are \cite{Mor96} and \cite{Conrad}.
+
+\begin{itemize}
+    \item
+    Let $\phi$ denote Euler's totient function, that is $\phi(n)$ counts the numbers between $1$ and $n$ that are coprime with $n$.
+    \item
+    Let $\ord_n(x)$ denote the order of element $x\in(\Z/n\Z)^\times$ in the multiplicative group $(\Z/n\Z)^\times$.
+    \item
+    Let the notation $(a,b)$ for $a,b\in\Z$ denote the greatest common divisor of $a$ and $b$, that is $\text{gcd}(a,b)$.
+\end{itemize}
+
+For positive integer $n$, the $n$'th complex roots of unity are the roots of the polynomial $X^n-1$ over $\C$, namely $\zeta_k = e^{2\pi i(k/n)}$ for $1\leq k\leq n$ which form a cyclic group of order $n$.
+The \emph{primitive} $n$'th complex roots of unity are those $\zeta_k$ for which $(k,n)=1$, of which there are $\phi(n)$ by definition of $\phi$.
+
+We may extend the notion of complex roots of unity to roots of unity over any field in which $X^n-1$ has $n$ distinct roots.
+These roots are the  $n$'th roots of unity denoted $\mu_n=\{\zeta_k\}_{k\in[n]}$.
+They form a cyclic subgroup of the field's multiplicative group with generators any roots of $X^n-1$ not roots of $X^m-1$ for any $m<n$.
+Such an element of $\mu_n$ must exist, otherwise some $X^m-1$ with $m|n$ would have $n>m$ roots.
+If $\zeta\in\mu_n$ is a generator, then $\zeta^k\in\mu_n$ has order $n/(n,k)$ and is therefore also a generator precisely when $k$ and $n$ are coprime.
+There are $\phi(n)$ generators of $\mu_n$ by definition of $\phi$.
+We call these generators the \emph{primitive} $n$'th roots of unity.
+
+
+\section{Extensions in general}
+
+After presenting the definition of cyclotomic extensions we immediately show such extensions are Galois.
+The Galois groups of $n$'th cyclotomic extensions are then shown isomorphic to subgroups of $(\Z/n\Z)^\times$
+At this point we introduce cyclotomic polynomials which we use in the following two sections, but before proceeding to those sections we prove two central properties of cyclotomic polynomials.
+The first is the fact that all cyclotomic polynomials have integer coefficients, and as such can be interpreted over any field.
+The second shows that all $n$'th cyclotomic polynomials are equivalent to the extent of such interpretation.
+
+Cyclotomic extensions are had by adjoining a complete set of $n$'th roots of unity to a field.
+A central assumption we carry throughout exploration of cyclotomic extensions is that if the characteristic of the field is non-zero (i.e. prime), then it does not divide $n$, otherwise the field cannot hold all $n$'th roots of unity.
+To see this, suppose the field has characteristic $p$ and $n=m\cdot p^\ell$.
+Since $p$ is prime we apply the Frobenius endomorphism to see $X^n-1=(X^m-1)^{p^\ell}$.
+Then for any $\zeta\in\mu_n$, $\zeta^n=1$ implies $\zeta^m=1$ with $m<n$ and therefore no element of $\mu_n$ can function as a primitive $n$'th root of unity in the field.
+So if we are to assume $\mu_n$ behaves as a complete set of $n$'th roots of unity in a field we must assume the field has characteristic zero or characteristic not dividing $n$.
+Henceforth we implicitly make this assumption.
+
+\begin{definition}
+    A $n$'th \emph{cyclotomic} extension of a field $F$ is obtained by adjoining a set of $n$'th roots of unity $\mu_n$ to $F$.
+    The roots of unity $\mu_n$ may belong to any extension field of $F$.
+    The field $F(\mu_n)$ is called an $n$'th cyclotomic field.
+\end{definition}
+Note that adjoining all $n$'th roots $\mu_n$ is equivalent to adjoining any generator of the set $\mu_n$, that is any primitive $n$'th root of unity.
+
+Consider the unique polynomial vanishing on exactly the $n$ distinct elements $\mu_n$, that is the polynomial $X^n-1$.
+Since $F(\mu_n)$ contains all $n$ roots of $X^n-1$ (that is $\mu_n$), it's clear that $X^n-1$ splits in $F(\mu_n)$.
+Moreover, since the $n$ elements of $\mu_n$ are distinct, $X^n-1$ splits into distinct linear factors in $F(\mu_n)$.
+With such splitting in mind we now show the extension $F(\mu_n)/F$ is Galois.
+
+\begin{theorem}[F(mu_n)/F is Galois]{$F(\mu_n)/F$ is Galois}
+    For a field $F$, the extension $F(\mu_n)/F$ is Galois.
+
+    \proof
+    We show normality and separability of this extension, that is the criteria for an extension to be Galois.
+    In both parts we use the following lemma, the proof of which is not relevant for our purposes.
+    Variations of the lemma can be found in many introductory texts on field theory (e.g. \cite{Mitchell}).
+    \begin{lemma}
+        Suppose $E/F$ is an algebraic field extension.
+        If the minimal polynomial over $F$ of \emph{some} $\alpha_0\in E$ splits in $E$, then the minimal polynomial over $F$ of \emph{every} $\alpha_i\in E$ splits in $E$.
+        Moreover, if the minimal polynomial of $\alpha_0$ is separable, then the minimal polynomial of \emph{every} $\alpha_i$ is separable.
+    \end{lemma}
+
+    Fix some $\zeta\in\mu_n$.
+    The minimal polynomial over $F$ of $\zeta$ is a factor of $X^n-1$.
+    To see this, suppose dividing $X^n-1$ by the minimal polynomial $f_\zeta$ of $\zeta$ leaves non-zero remainder $r$.
+    Then $r$ must be of degree less than $f_\zeta$ and vanish on $\zeta$ (since both $X^n-1$ and $f_\zeta$ vanish on $\zeta$).
+    As such, $r$ contradicts the minimality of $f_\zeta$.
+
+    \bold{Normality:}
+    Since $X^n-1$ splits in $F(\mu_n)$, so does its factors, including the minimal polynomial of $\zeta\in F(\mu_n)$.
+    Applying the lemma above we conclude the minimal polynomial over $F$ of \emph{every} element in $F(\mu_n)$ splits in $F(\mu_n)$, and thus the extension $F(\mu_n)/F$ is normal.
+
+    \bold{Separability:}
+    Since $X^n-1$ splits into \emph{distinct} linear factors in $F(\mu_n)$, so does its factors, including the minimal polynomial over $F$ of $\zeta\in F(\mu_n)$.
+    Therefore the minimal polynomial of $\zeta$ is separable.
+    Applying the lemma above we conclude the minimal polynomial over $F$ of \emph{every} element in $F(\mu_n)$ is separable, and thus the extension $F(\mu_n)/F$ is separable.
+\end{theorem}
+
+With $F(\mu_n)/F$ Galois, what can we say about its Galois group?
+Recall from \link[Algebra]{&&algebra} that the Galois group of a Galois extension $F(\mu_n)/F$ is the group of automorphisms on $F(\mu_n)$ that fix $F$.
+Since the field $F(\mu_n)$ is composed of $F$ and $\mu_n$, an automorphism on $F(\mu_n)$ that fixes $F$ is defined solely by its behavior on $\mu_n$.
+For every $\sigma\in\Gal(F(\mu_n)/F$, the next theorem shows this behavior to be $\sigma(\zeta) = \zeta^k$ for all $\zeta\in\mu_n$ and some $k$ coprime with $n$.
+Thus $\sigma$ may be defined piecewise on $F(\mu_n)$ as
+\begin{equation}
+    \sigma(x) =
+    \begin{cases}
+        x^k, & x \in\mu_n \\
+        x, & x \in F
+    \end{cases}
+\end{equation}
+
+\begin{theorem}[Gal(F(mu_n)/F) is isomorphic to a subgroup of (Z/nZ)^*]{$\Gal(F(\mu_n)/F)$ is isomorphic to a subgroup of $(\Z/n\Z)^\times$}
+    Each automorphism of $\Gal(F(\mu_n)/F)$ is determined by some integer coprime with $n$.
+    Let $\sigma_k$ denote the automorphism determined by integer $k$ with $(k,n)=1$.
+    Then $\sigma_k(\zeta)=\zeta^k$ for all $\zeta\in\mu_n$.
+
+    The map $\sigma_k\to(k+\Z)$ of signature $\Gal(F(\mu_n)/F)\to(\Z/n\Z)^\times$ is an injective group homomorphism.
+    Therefore, $\Gal(F(\mu_n)/F)$ is isomorphic to a subgroup of $(\Z/n\Z)^\times$.
+
+    \proof
+    Fix some primitive root of unity $\zeta_0\in\mu_n$, and recall that all generators of $\mu_n$ have the form $\zeta_0^k$ for some $k$ coprime with $n$.
+
+    Since the automorphisms $\Gal(F(\mu_n)/F)$ of the field $F(\mu_n)$ fix the subfield $F$, they necessarily map $F(\mu_n)\setminus F = \mu_n$ to itself.
+    Moreover, since they are automorphisms of the multiplicative group $F(\mu_n)^\times$, they are group automorphisms of $\mu_n$.
+    As any automorphism of the group $\mu_n$ must map generators to generators, for $\sigma\in\Gal(F(\mu_n)/F)$ we must have $\sigma(\zeta_0)=\zeta_0^k$ for some $k$ coprime with $n$.
+    With any element of $\mu_n$ taking the form $\zeta_0^t$ for some $t$, we have
+    \begin{equation}
+        \sigma(\zeta_0^t) = \sigma(\zeta_0)^t = (\zeta_0^k)^t = (\zeta_0^t)^k
+    \end{equation}
+    Thus $\sigma$ is defined by raising all elements of $\mu_n$ to $k$.
+    We associate $\sigma$ with $k$ and write $\sigma_k$.
+    To see the subscript notation $\sigma_k$ is unique modulo $n$, suppose $\sigma_{k'}=\sigma_k$.
+    Then $\zeta_0^{k-k'}=1$ and since $\zeta_0$ has order $n$, it must be that $k-k'$ divides $n$.
+
+    We now show the map $\sigma_k\to(k+\Z)$ is an injective group homomorphism from $\Gal(F(\mu_n)/F)$ to $(\Z/n\Z)^\times$.
+    The fact that $(k,n)=1$ for all $\sigma_k$ implies the image of $\sigma_k$ is contained in $(\Z/n\Z)^\times$.
+    For $\sigma_k,\sigma_{k'}\in\Gal(F(\mu_n)/F)$ and $\zeta\in\mu_n$ we have 
+    \begin{equation}
+        \sigma_k\circ\sigma_{k'}(\zeta) = \sigma_k(\sigma_{k'}(\zeta))
+        = \zeta^{kk'} = \sigma_{kk'}
+    \end{equation}
+    Denoting the map by $\psi$ we readily see it is a homomorphism as
+    \begin{equation}
+        \psi(\sigma_k\circ\sigma_{k'}) = \psi(\sigma_{kk'}) = kk' = \psi(\sigma_k)\cdot\psi(\sigma_{k'})
+    \end{equation}
+    The kernel of the homomorphism is all $\sigma_k$ such that $k\equiv1(\bmod n)$ in which case $\sigma_k$ is the identity function, that is the identity element of the Galois group.
+    The homomorphism is therefore injective.
+\end{theorem}
+
+We now introduce cyclotomic polynomials for their roles in cyclotomic extensions of $\Q$ and $\F_q$ as explored in the next two sections.
+The $n$'th cyclotomic polynomial is defined as the monic, non-zero polynomial vanishing on the primitive $n$'th roots of unity in $\mu_n$.
+Suppose $\zeta_0\in\mu_n$ is a primitive root of unity.
+\begin{equation}
+    \Phi(X)\coloneqq\prod_{\substack{
+        \text{$n$'th primitive}\\
+        \text{roots of unity $\zeta$}
+    }} (X - \zeta)
+    = \prod_{\substack{1\leq k\leq n\\\text{gcd}(k,n)=1}} (X-\zeta_0^k)
+\end{equation}
+Since there are $\phi(n)$ primitive $n$'th roots of unity, $\Phi_n$ has degree $\phi(n)$.
+
+We may partition the $n$'th roots of unity into all sets of primitive $d$'th roots of unity, one set for every $d$ dividing $n$.
+To see this, note that every $n$'th root of unity generates a subgroup of order $d$ and is therefore a primitive $d$'th root of unity for exactly one $d$ dividing $n$.
+On the other hand, since $d$ divides $n$ every primitive $d$'th root of unity is also an $n$'th root of unity.
+With this partition in mind we may represent $X^n-1$ as the product of all cyclotomic polynomials $\Phi_d(X)$ for $d$ a divisor of $n$.
+\begin{equation}
+    X^n - 1 = \prod_{d|n} \Phi_d(X)
+\end{equation}
+We may regard this equation as an implicit, recursive definition of cyclotomic polynomials, written explicitly as
+\begin{equation}
+    \Phi_n(X) = \big(X^n - 1\big) \Bigg/ \prod_{\substack{d|n\\d\neq n}} \Phi_d(X)
+\end{equation}
+
+A potentially surprising property of cyclotomic polynomials is that they have integer coefficients.
+Indeed, regardless the $n$'th roots of unity $\mu_n$ used to define $\Phi_n$, even if the \emph{irrational} complex roots of unity, expanding the polynomial $\Phi_n$ into coefficient form always yields integer coefficients.
+Note that integer coefficients can alternatively be interpreted as belonging to any field by identifying them with multiples of the field's additive identity.
+Thus when considering $\Phi_n$ over $F(\mu_n)$ we may say $\Phi_n$ has coefficients over $F$.
+
+\begin{theorem}[Phi_n(X) is in Z[X]]{$\Phi_n[X]\in\Z[X]$}
+    The $n$'th cyclotomic polynomial $\Phi_n$ has integer coefficients.
+
+    \proof
+    We show this by induction using the recursive definition of cyclotomic polynomials.
+    The base case in clear with $\Phi_1(X)=X-1\in\Z[X]$.
+    For induction consider the equation
+    \begin{equation}
+        X^n-1 = \Phi_n(X) \cdot
+        \prod_{\substack{d|n\\d\neq n}}\Phi_d(X) = \Phi_n(X)\cdot\gamma(X)
+    \end{equation}
+    The polynomial $X^n-1$ has integer coefficients, and by induction so does $\gamma$.
+    Note that $\gamma$ is also monic as it is the product of monic polynomials.
+    Then one may observe that in dividing $X^n-1$ by $\gamma$, the long division algorithm in $\Z[X]$ must yield a polynomial also in $\Z[X]$.
+    For a more explicit argument, suppose the long division algorithm in $\Z[X]$ yields quotient $q\in\Z[X]$ and remainder $r\in\Z[X]$ such that $X^n-1=q(X)\gamma(X)+r(X)$.
+    Then $q(X)\gamma(X)+r(X)=\Phi_n(X)\gamma(X)$ forces $r(x)=\gamma(X)(\Phi_n(X)-q(X))$ to be zero, otherwise $\deg(r)\geq\deg(\gamma)$.
+    Therefore, $\Phi_n=q\in\Z[X]$.
+\end{theorem}
+
+We can strengthen the previous result further.
+We can in fact say that all cyclotomic polynomials are equivalent in the sense that two $n$'th cyclotomic polynomials defined over different fields share the same roots when interpreted over the same field.
+As mentioned previously, such cross-field interpretation is possible because cyclotomic polynomials have integer coefficients.
+As a result, a lot can be said about cyclotomic polynomials (almost) oblivious to the field over which they're defined.
+We examine some such field-independent properties in \link[Cyclotomic polynomials]{&cyclotomic polynomials}.
+
+We demonstrate equivalence between $n$'th cyclotomic polynomials by showing they are all equivalent to the $n$'th cyclotomic polynomial over $\C$.
+Consider the $n$'th cyclotomic polynomial in $\C[X]$ defined as vanishing exactly on $e^{2\pi i(k/n)}$ for $1\leq k\leq n$ with $(n,k)=1$.
+Interpreting this polynomial over any $n$'th cyclotomic field $F(\mu_n)$, we argue it vanishes on the primitive $n$'th roots of unity in $\mu_n$.
+Therefore, the following two polynomials are equal:
+\begin{itemize}
+    \item
+    The $n$'th cyclotomic polynomial defined over $F(\mu_n)$ as vanishing on exactly the primitive $n$'th roots of unity in $\mu_n$.
+    \item
+    The $n$'th cyclotomic polynomial defined over $\C$ and interpreted over $F(\mu_n)$.
+\end{itemize}
+By the transitivity of equivalence, we may then say any two cyclotomic polynomials defined over different fields are equivalent `up to interpretation.'
+
+\begin{theorem}[Phi_n in C[X] equates to Phi_n in F(mu_n)[X]]{$\Phi_n\in\C[X]\equiv\Phi_n\in F(\mu_n)[X]$}
+    Let $\Phi_n$ be the $n$'th cyclotomic polynomial in $\C[X]$.
+    Let $F(\mu_n)$ be an $n$'th cyclotomic field.
+    Then $\overline{\Phi_n}\in F(\mu_n)[X]$ vanishes on precisely the primitive $n$'th roots of unity in $\mu_n$, where $\overline{\Phi_n}$ is $\Phi_n$ interpreted over $\F(\mu_n)$.
+
+    \proof
+    Let $\overline{x}$ for $x\in\Z[X]$ denote $x\in F[X]$, that is $x$ from $\Z[X]$ interpreted in $F[X]$.
+    Suppose division of $X^n-1$ by $\Phi_n$ in $\Z[X]$ yields quotient $q$ and remainder $r$.
+    Then we may write $\overline{X^n-1} = \overline{\Phi_n}(X)\cdot\overline{q}(X)+\overline{r}(X)$ with relations $\deg(\overline{r})<\deg(\overline{\Phi_n})=\phi(n)$ still holding.
+    That is, as $\Phi_n$ divides $X^n-1$ in $\Z[X]$, so $\overline{\Phi_n}$ divides $\overline{X^n-1}=X^n-\overline{1}$ in $F[X]$.
+    Note that $X^n-\overline{1}$ splits in $F(\mu_n)$ with roots $\mu_n$, and therefore its factor $\overline{\Phi_n}$ also splits in $F(\mu_n)$ with roots some subset of $\mu_n$.
+    Since the subset must be of size $\phi(n)=\deg(\overline{\Phi_n})$, we are left to show that all roots of $\overline{\Phi_n}$ are primitive $n$'th roots of unity.
+
+    Supposing $\overline{\Phi_n}(\zeta)=0$ for $\zeta\in\mu_n$, we must show $\zeta$ is a primitive $n$'th root of unity.
+    We will refer to the following equation as the `cyclotomic decomposition' of $\zeta^m-\overline{1}$ for some $m$.
+    \begin{equation}
+        \zeta^m-\overline{1} = \prod_{d|m} \overline{\Phi_d}(\zeta)
+    \end{equation}
+    Suppose $\zeta$ is not a primitive $n$'th root of unity.
+    Then $\zeta$ is a primitive $m$'th root of unity for some proper divisor $m$ of $n$.
+    The cyclotomic decomposition of $\zeta^m-\overline{1}$ suggests $\overline{\Phi_d}(\zeta)=0$ for some $d|m$ which is a proper divisor of $n$.
+    We now contradict this statement by recalling that $X^n-\overline{1}$ has no repeated roots, and therefore $\zeta$ can only vanish on one of its factors.
+    That is, $\overline{\Phi_d}(\zeta)=0$ can only occur for one $d|n$ in the cyclotomic decomposition of $\zeta^n-\overline{1}$.
+    Since we assume $\overline{\Phi_n}(\zeta)=0$, it must be that $\overline{\Phi_d}(\zeta)\neq0$ for all proper divisors $d$ of $n$.
+\end{theorem}
+
+
+\section[Extensions of Q]{Extensions of $\Q$}
+
+First we examine the reducibility of $\Phi_n$ over $\Q$, then see what it means for the Galois group $\Q(\mu_n)/\Q$.
+We also mention the ring of integers of $\Q(\mu_n)$.
+Note that since the field $\Q$ has characteristic zero, we have met the assumption stated at the start of the prior section to ensure $\mu_n$ functions as a full set of $n$'th roots of unity over $\Q$.
+
+\begin{theorem}[Phi_n is irreducible over Q]{$\Phi_n$ is irreducible over $\Q$}
+    The $n$'th cyclotomic polynomial $\Phi_n$ is irreducible over $\Q$.
+
+    \proof
+    See \cite{Weintraub} for several of the most historical proofs.
+
+    \proof
+    Here we give a proof adapted from \cite{Chen06}.
+
+    Suppose $\Phi_n(X)=f(x)g(x)\in\Z[X]$ with $f$ irreducible over $\Q$.
+    We will prove that for all primes $p$ not dividing $n$, if primitive $n$'th root of unity $\zeta$ is a root of $f$, then so is $\zeta^p$.
+    Therefore, for all $\phi(n)$ values $k$ with $(k,n)=1$ we can say $\zeta^k$ is also a root of $f$, and thus $f$ has degree $\phi(n)$ so it must be $\Phi_n$ itself.
+    To justify the latter conclusion, consider how any $k$ has a prime decomposition, and to say $(k,n)=1$ is to say no prime in the decomposition divides $n$.
+    To show $f$ vanishes on $\zeta^k$, we raise $\zeta$ consecutively to each instance of each prime in the decomposition.
+    Each time we do so, we are raising a primitive $n$'th root of unity on which $f$ vanishes to a prime not dividing $n$, so we may conclude the result is another primitive $n$'th root of unity on which $f$ vanishes.
+
+    Now we prove that for prime $p$ not diving $n$, $\zeta^p$ is a root of $f$.
+    Since $\zeta^p$ is an $n$'th primitive root of unity, we have $\Phi_n(\zeta^p)=0$ in which case either $f(\zeta^p)=0$ or $g(\zeta^p)=0$.
+    Suppose the latter for sake of contradiction.
+    Since $f$ is irreducible it must be the minimal polynomial of $\zeta$ over $\Q$ and so must divide $g(x^p)$.
+    Now $f$ and $g$ have rational coefficients because they are products of the minimal polynomials of the primitive $n$'th roots of unity over $\Q$.
+    Then by a variant of what's known as \link[Gauss' Lemma]{jupiter.math.nycu.edu.tw/~weng/courses/alg_2007/Algebra\%202006-2/GaussLemma.pdf}, by the fact that $f(x)g(x)=\Phi_n(x)$ it must be that $f$ and $g$ and thus $g(x^p)$ have integer coefficients.
+    With quotient $q\in\Q[X]$, $f\in\Z[X]\subseteq\Q[X]$ and $g(x^p)\in\Z[X]$, we apply Gauss' Lemma again to the equation $f(x)q(x)=g(x^p)$ and conclude $q\in\Z[X]$.
+    We may then pass the equation $f(x)q(x)=g(x^p)$ through the homomorphism $\overline{\cdot}\colon\Z[X]\to\Z_p[X]$ reducing modulo $p$.
+    With $\overline{g}(x^p)=\overline{g}(x)^p$ by the Frobenius automorphism, we have $\overline{f}(\zeta)\overline{q}(\zeta)=\overline{g}(\zeta)^p=0$.
+    Considering the equation $\overline{g}(\zeta)^p=0$ in $\C$ we conclude $\overline{g}(\zeta)=0$ since $\C$ has no zero divisors.
+
+    Now $\overline{\Phi_n}$ divides $\overline{X^n-1}=X^n-\overline{1}$ and $\overline{\Phi_n}=\overline{f}(X)\overline{g}(X)$, so we may write
+    \begin{equation}
+        X^n-\overline{1} = \frac{X^n-\overline{1}}{\overline{\Phi_n}(X)}
+            \cdot\overline{f}(X)\cdot\overline{g}(X)
+    \end{equation}
+    By $\overline{f}(\zeta)=\overline{g}(\zeta)=0$ we see $\zeta$ is a double root of $X^n-\overline{1}$.
+    But $X^n-\overline{1}$ has non-zero derivative $nX^n$ since we assume $p$ doesn't divide $n$, and therefore $X^n-\overline{1}$ has no repeated roots.
+    Thus a contradiction.
+\end{theorem}
+
+The irreducibility of $\Phi_n$ over $\Q$ allows us to determine the degree of the extension $\Q(\mu_n)/\Q$.
+Recall that $\Phi_n$ over $\Q(\mu_n)$ has $\phi(n)$ roots, namely the primitive $n$'th roots of unity.
+Since $\Phi_n$ is irreducible over $\Q$, it must be the minimal polynomial for these primitive $n$'th roots of unity.
+Therefore the extension $\Q(\mu_n)/\Q$ has degree $\phi(n)$.
+To see this, note that the field $\Q(\mu_n)$ is equivalent to the field $\Q[X]/\Phi_n(X)$ with equality had by identifying $X$ with any primitive $n$'th root of unity.
+The field $\Q[X]/\Phi_n(X)$ extends $\Q$ with degree $\deg(\Phi_n)=\phi(n)$ and the claim follows.
+
+The identity $[\Q(\mu_n):\Q]=\phi(n)$ allows us to now fully determine the Galois group.
+\begin{corollary}[Gal(Q(mu_n)/Q) is isomorphic to (Z/nZ)^*]{$\Gal(\Q(\mu_n)/\Q)\cong(\Z/nZ)^\times$}
+    The Galois group $\Gal(\Q(\mu_n)/\Q)$ is isomorphic to the multiplicative group $(\Z/nZ)^\times$.
+
+    \proof
+    We will not prove it here, but a basic fact of Galois theory is that the order of the Galois group equals the degree of the Galois extension.
+    Having just established that $\Q(\mu_n)/\Q$ has degree $\phi(n)$, we conclude
+    \begin{equation}
+        \big|\Gal(\Q(\mu_n)/\Q)\big| = \big[\Q(\mu_n) : \Q\big] = \phi(n)
+    \end{equation}
+    We previously showed that \link[$\Gal(\Q(\mu_n)/\Q)$ is isomorphic to a subgroup of $(\Z/n\Z)^\times$]{#Gal(F(mu_n)/F) is isomorphic to a subgroup of (Z/nZ)^*}.
+    Since the group $(\Z/n\Z)^\times$ has order $\phi(n)$ we conclude the subgroup must be $(\Z/n\Z)^\times$ itself.
+\end{corollary}
+
+Before moving on to the case of finite fields, we mention another important theorem of cyclotomic extensions of $\Q$.
+The ring of integers of the field $\Q(\mu_n)$ is the ring $\Z[\mu_n]$.
+The ideals of the ring $\Z[\mu_n]$ are the `ideal lattices' at the foundation of modern lattice cryptography.
+Note that $\Z[\mu_n]$ is equivalent to $\Z[X]/\Phi_n(X)$.
+
+\begin{theorem}[O_{Q(mu_n)} = Z[mu_n]]{$\mathcal{O}_{\Q(\mu_n)}=\Z[\mu_n]$}
+    The ring of integers of $\Q(\mu_n)$ is $\Z[\mu_n]$.
+
+    \proof
+    The proof is involved, see \cite{Nguyen}.
+\end{theorem}
+
+
+\section[Extensions of F_q]{Extensions of $\F_q$}
+
+In contrast to the previous section, we first examine the Galois group $\F_q(\mu_n)/\F$, then see what it means for the reducibility of $\Phi_n$ over $\F_q$.
+Since finite fields have non-zero characteristic, recall that if $\mu_n$ is to function as a full set of $n$'th roots of unity in a finite field, the field characteristic cannot divide $n$.
+We continue to implicitly make this assumption below.
+
+We already know that \link[$\Gal(F_q(\mu_n)/F_q)$ is isomorphic to a subgroup of $(\Z/n\Z)^\times$]{#Gal(F(mu_n)/F) is isomorphic to a subgroup of (Z/nZ)^*}.
+We now argue this subgroup in generated by $q$.
+
+\begin{theorem}[Gal(F_q(mu_n)/F_q) is isomorphic to <q+Z>]{$\Gal(\F_q(\mu_n)/\F_q)$ is isomorphic to $\langle q+\Z\rangle$}
+    For prime power $q$, the group $\Gal(\F_q(\mu_n)/\F_q)$ is isomorphic to the subgroup $\langle q+\Z\rangle$ of $(\Z/n\Z)^\times$ and thus has order $\ord_n(q)$.
+
+    \proof
+    We will show the $q$'th power map is an element of the galois group, and then show the $q$'th power map in fact generates the Galois group.
+    Using this knowledge we determine the image of the Galois group in $(\Z/n\Z)^\times$.
+
+    Before proceeding we mention the Frobenius map.
+    Suppose $q=p^\ell$.
+    The Frobenius map is the $p$'th power map, which is an endomorphism of $\F_q(\mu_n)$.
+    In fact, it is an automorphism of $\F_q(\mu_n)$ because its injective and $\F_q(\mu_n)$ is finite.
+    To see injectivity, note the kernel is all $x^\in\F_q(\mu_n)$ such that $x^p=0$, and since $\F_q(\mu_n)$ contains no zero divisors this only holds for $x=0$.
+
+    To show that the $q$'th power map belongs to $\Gal(\F_q(\mu_n)/\F_q)$, we show it is an automorphism fixing the field precisely equal to $\F_q$.
+    The map is an automorphism because it is the $\ell$-depth composition of the Frobenius map, itself an automorphism.
+    The $q$'th power map clearly fixes the additive identity of $\F_q$, and it also fixes the multiplicative group $\F_q^\times$ because group order $q-1$ implies $x^{q-1}=1$ for $x\in\F_q^\times$.
+    Thus the $q$'th power map fixes $\F_q$, and to see that it \emph{only} fixes the $q$ elements of $\F_q$, note that $X^q-X$ has no more than $q$ roots.
+    Furthermore, we can the same about all automorphisms generated by the $q$'th power map. 
+    That is, the subgroup of $\Gal(\F_q(\mu_n)/\F_q)$ generated by the $q$'th power map also fixes $\F_q$.
+
+    We now invoke the fundamental theorem of Galois theory to argue that two different subgroups of $\Gal(\F_q(\mu_n)/\F_q)$ must fix different fields.
+    By definition, the goup $\Gal(\F_q(\mu_n)/\F_q)$ fixes the field $\F_q$, but so does the subgroup generated by the $q$'th power map.
+    Therefore, these groups are in fact the same, that is the $q$'th power map generates $\Gal(\F_q(\mu_n)/\F_q)$.
+
+    Finally we determine the image of the Galois group in $(\Z/n\Z)^\times$.
+    Recall that the isomorphism from $\Gal(\F_q(\mu_n)/\F_q)$ to a subgroup of $(\Z/n\Z)^\times$ takes the form $\sigma_k\to(k+\Z)$ where $\sigma_k$ is the $k$'th power map on $\mu_n$ and the identity map on $\F_q$.
+    To say the $q$'th power map generates the Galois group is to say $\sigma_q$ generates the Galois group.
+    Since $\sigma_q$ maps to $(q+\Z)$, we may conclude that the image is generated by $(q+\Z)$.
+    Therefore the Galois group maps to the subgroup $\langle q+\Z\rangle$ of $(\Z/n\Z)^\times$, which has order $\ord_n(q)$.
+\end{theorem}
+
+Again invoking the fact that the order of the Galois group is equal to the degree of the Galois extension, we conclude the extension $\F_q(\mu_n)/\F_q$ has degree $\ord_n(q)$.
+Now we utilize this fact to examine how $\Phi_n$ splits in the field $\F_q$.
+
+\begin{theorem}[Reducibility of Phi_n over F_q]{Reducibility of $\Phi_n$ over $\F_q$}
+    Over the field $\F_q$ the polynomial $\Phi_n$ splits into $\phi(n)/\ord_n(q)$ monic, irreducible factors each of degree $\ord_n(q)$.
+
+    \proof
+    By definition, $\Phi_n$ over $\F_q(\mu_n)$ has degree $\phi(n)$ and vanishes on the $\phi(n)$ primitive $n$'th roots of unity.
+    Therefore every irreducible factor of $\Phi_n$ over $\F_q$ is the minimal polynomial of one or more primitive $n$'th roots of unity.
+
+    Fix a primitive $n$'th root of unity $\zeta$ with minimal polynomial $f_\zeta$ (an irreducible factor of $\Phi_n$ over $\F_q$).
+    The field $\F_q(\zeta)$ is a cyclotomic extension of $\F_q$.
+    As implied by the previous theorem, the extension $\F_q(\zeta)/\F_q$ has degree $\ord_n(q)$.
+    But this extension is equivalent to $\F_q[X]/f_\zeta(X)$ which has degree $\deg(f_\zeta)$.
+    Therefore all irreducible factors of $\Phi_n$ over $\F_q$ have degree $\ord_n(q)$.
+    Since $\Phi_n$ has degree $\phi(n)$, there are $\phi(n)/\ord_n(q)$ such factors.
+\end{theorem}
+
+We restate the previous theorem for the special case in which $\Phi_n$ is irreducible over $\F_q$.
+
+\begin{corollary}[Irreducibility of Phi_n over F_q]{Irreducibility of $\Phi_n$ over $\F_q$}
+    In the field $\F_q$ the polynomial $\Phi_n$ is irreducible if and only if $\ord_n(q)=\phi(n)$.
+\end{corollary}
+
+
+\begin{references}
+    \source{Chen06}
+    \title{Course notes}
+    \authors{Jungkai Alfred Chen}
+    \when{2006}
+    \where{Department of Mathematics, National Taiwan University}
+    \other
+    \link[Notes]{www.math.ntu.edu.tw/~jkchen/F06AA/F06AA1L11.pdf}
+
+    \source{Conrad}
+    \title{Cyclotomic Extensions}
+    \authors{Keith Conrad}
+    \when{}
+    \where{}
+    \other
+    \link[Cyclotomic blurb]{kconrad.math.uconn.edu/blurbs/galoistheory/cyclotomic.pdf}
+
+    \source{Mitchell}
+    \title{Supplementary field theory notes}
+    \authors{Steve Mitchell}
+    \when{}
+    \where{}
+    \other
+    \link[math.washington.edu]{sites.math.washington.edu/~mitchell/Algg/field.pdf}
+
+    \source{Mor96}
+    \title{Field and Galois Theory}
+    \authors{Patrick J. Morandi}
+    \when{1996}
+    \where{Springer Science & Business Media}
+    \other
+    \link[Springer Link]{link.springer.com/book/10.1007/978-1-4612-4040-2}
+    See the section on Cyclotomic Extensions.
+
+    \source{Nguyen}
+    \title{A Note on Cyclotomic Integers}
+    \authors{Nicholas Phat Nguyen}
+    \when{}
+    \where{}
+    \other
+    \link[arXiv:1706]{arxiv.org/ftp/arxiv/papers/1706/1706.05390.pdf}
+
+    \source{Weintraub}
+    \title{Several Proofs of the Irreducibility of the Cyclotomic Polynomials}
+    \authors{Steven H. Weintraub}
+    \when{}
+    \where{}
+    \other
+    \link[lehigh.edu]{lehigh.edu/~shw2/c-poly/several_proofs.pdf}
+\end{references}
