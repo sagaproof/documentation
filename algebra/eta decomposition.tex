@@ -1,0 +1,93 @@
+
+\begin{theorem}[Polynomial eta-decomposition]{Polynomial $\eta$-decomposition}
+    Let $p$ be any polynomial over a commutative ring, and denote the 'size' of $p$ by $n=\deg(p)+1$.
+    Then $p$ may be decomposed by any non-constant, monic polynomial $\eta$ into $\deg(\eta)$ polynomials $p^{(0)},\dots,p^{(\deg(\eta)-1)}$ all of degree at most $n/\deg(\eta)-1$ such that
+    \begin{equation}
+        p(x) = \sum_{i=0}^{\deg(\eta)-1} p^{(i)}(\eta(x))x^i
+    \end{equation}
+    Furthmore, if $\eta$ is a monomial then 
+    \begin{equation}
+        p^{(i)}(x) = \sum_{j=0}^{n/\deg(\eta)-1} p[i+j\cdot\deg(\eta)]x^j
+    \end{equation}
+    where the square brackets index into $p$'s coefficients.
+
+    \proof
+    First invoke the following recursive algorithm on $p$ to obtain a 'transposed' decomposition, from which we will then take the desired decomposition.
+
+    \begin{enumerate}
+        \begin{itemize}[square]
+            \bold{Decompose:}
+            \item
+            \bold{Input:} polynomial $t$. Let $n_t=\det(t)+1$
+            \item
+            \bold{Output:} polynomials $t^{(0)},\dots,t^{(\ceil{n_t/\eta}-1)}$ with $\deg(t^{(i)})<\deg(\eta)$ for all $i$ such that
+            \begin{align}
+                t(x) = \sum_{i=0}^{\ceil{n_t/\deg(\eta)}-1} t^{(i)}(x)\eta(x)^i
+            \end{align}
+            Furthermore, if $\eta$ is a monomial then
+            \begin{equation}
+                t^{(i)} = \sum_{j=0}^{\deg(\eta)-1} t[j+i\cdot\deg(\eta)]x^j\tag{1}\label{t-form}
+            \end{equation}
+        \end{itemize}
+
+        \item
+        If $\deg(t)<\deg(\eta)$ output $t^{(0)}\coloneqq t$.
+        Otherwise, divide $t$ by $\eta$ to get quotient $q$ and remainder $r$ with $\deg(r)<\eta$.
+        Note $\deg(q)+\det(\eta) = \deg(t)$, and that zero-divisors do not spoil division since $\eta$ is monic.
+
+        If $\eta$ is a monomial then the coefficients of $t$ will be distributed among $q$ and $r$ as
+        \begin{align}
+            q(x) &= \sum_{i=0}^{\deg(t)-\deg(\eta)} t[\deg(\eta)+i]x^i \tag{2}\label{q-form} \\
+            r(x) &= \sum_{i=0}^{\deg(t)-1} t[i]x^i \tag{3}\label{r-form}
+        \end{align}
+
+        \item
+        Let $n_q=\det(q)+1$.
+        Invoke \bold{Decompose} on $q$ to get $q^{(0)},\dots,q^{(\ceil{n_q/\deg(\eta)}-1)}$ with $\deg(q^{(i)})<\det(\eta)$ for all $i$.
+
+        \item
+        For $\alpha\in\R$ we have the identity $\floor{\alpha-1} = \floor{\alpha}-1$, from which we infer
+        \begin{align}
+            &\deg(q)+\deg(\eta)=\det(t) \\
+            &\implies n_q = n_t-\deg(\eta) \\
+            &\implies \ceil{\frac{n_q}{\deg(\eta)}}
+                = \ceil{\frac{n_t}{\deg(\eta)}-1}
+                = \ceil{\frac{n_t}{\det(\eta)}}-1
+        \end{align}
+        Now $t$ may be expressed as
+        \begin{align}
+            t(x)
+            &= r(x) + \eta(x)q(x) \\
+            &= r(x) + \eta(x)\sum_{i=0}^{\ceil{n_q/\deg(\eta)}-1} q^{(i)}(x)\eta(x)^i \\
+            &= r(x) + \sum_{i=1}^{\ceil{n_q/\deg(\eta)}} q^{(i-1)}(x)\eta(x)^i \\
+            &= \sum_{i=0}^{\ceil{n_t/\det(\eta)}-1} t^{(i)}(x)\eta(x)^i
+        \end{align}
+        Where in the last expression we assigned $t^{(0)},\dots,t^{(\ceil{n_t/\eta}-1)} \coloneqq r,q^{(0)},\dots,q^{(\ceil{n_q/\eta}-1)}$.
+        Thus the decomposition satisfies the promised general form.
+        For the case that $\eta$ is a monomial, $t^{(0)}=r$ is correct by way of $\eqref{r-form}$, and $t^{(i)}$ for $i>0$ is correct by the combination of the form of $q^{(i)}$ in $\eqref{t-form}$ and the form of $q$ in $\eqref{q-form}$, yielding
+        \begin{align}
+            t^{(i)}(x) &= q^{(i-1)} \\
+            &= \sum_{j=0}^{\deg(\eta)-1} q[j+(i-1)\deg(\eta)]x^j \\
+            &= \sum_{j=0}^{\deg(\eta)-1} t[\deg(\eta)+(j+(i-1)\deg(\eta))]x^j \\
+            &= \sum_{j=0}^{\deg(\eta)-1} t[j+i\cdot\deg(\eta)]x^j \\
+        \end{align}
+    \end{enumerate}
+
+    The current decomposition is a polynomial with respect to $\eta(x)$ of degree less than $\ceil{n_t/\deg(\eta)}$ with coefficients as polynomials with respect to $x$ of degree less than $\eta$. 
+    The desired decomposition is a polynomial with respect to $x$ of degree less than $\eta$ with coefficients as polynomials with respect to $\eta(x)$ of degree less than $\ceil{n_t/\deg(\eta)}$.
+    Hence the current decomposition may transformed into the desired decomposition by something of a transposition, that is swapping polynomial indices and coefficient indices, that is assigning $p_j^{(i)}\coloneqq t_i^{(j)}$.
+\end{theorem}
+
+
+\begin{theorem}[eta-decomposition by interpolation]{$\eta$-decomposition by interpolation}
+    If the preimage of some $\alpha$ under $\eta$ has size at least $\deg(\eta)$ and contains no zero-divisors, then interpolating $p$ over this preimage yields a polynomial with coefficients $p^{(0)}(\alpha),\dots,p^{(\deg(\eta)-1)}(\alpha)$, namely the $\eta$-decomposition polynomials of $p$ on $\alpha$.
+
+    \proof
+    Let $Y = \eta^{-1}(\alpha)$, noting $|Y|\geq\eta$.
+    Then $p$ restricted to $Y$ yields the polynomial
+    \begin{equation}
+        p(y) = \sum_{i=0}^{\deg(\eta)-1} p_i(\eta(y))y^i
+        = \sum_{i=0}^{\deg(\eta)-1} p_i(\alpha)y^i
+    \end{equation}
+    This polynomial of degree less than $\deg(\eta)$ may be interpolated over any $\deg(\eta)$ values of $Y$, thus extracting coefficients $p^{(0)}(\alpha),\dots,p^{(\deg(\eta)-1)}(\alpha)$.
+\end{theorem}
