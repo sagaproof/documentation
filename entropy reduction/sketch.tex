@@ -1,0 +1,36 @@
+
+Let an SIS commit to a {0,..,v} vector mean a commit to a {0,..,v}-valued vector.
+Start with the prover claiming an opening to an SIS commit to a vector of Euclidean norm.
+Reduce instead to prover claiming openings to s SIS commits to {0,..,w-1} vectors (w chosen later).
+Eg, one (inefficient) way is using binary decomposition into {0,1} vectors of the same length.
+Then use the following protocol for proof composition.
+
+1.
+Start with prover claiming openings to s SIS commits to {0,..,w-1} vectors.
+Use, say, binary decomposition to somehow split each commit into w commits to {0,1} vectors.
+The new vectors will be a 2^w/w^s factor shorter in length.
+2.
+Use a succinct proof technique, such as sumcheck, to reduce certain checks on the w vectors to evaluating them as polynomials.
+3.
+A. Check that each vector contains only {0,1} values.
+B. Reconstruct the original vectors from the binary decomposition, and check that the original vectors indeed open to the original commits.
+The two checks together also ensure the original vectors have values in {0,..,w-1}.
+4.
+Use a random w by s binary matrix (with no column all 1's) as a challenge to both the openings of the new vectors and also their polynomial evaluations.
+5.
+Multiplying the w commits to {0,1} vectors by this matrix the verifier gets s commits to {0,..,w-1} vectors (to permit all 1's columns permits {0,..,w} vectors which complicates analysis and binary decomposition).
+6.
+Prover sends the resulting s vectors to the verifier who checks they only contain {0,..,w-1} values and satisfy polynomial evaluations.
+
+To extract knowledge for a single run of the protocol, use the heavy table argument, which requires 2 valid challenge/response pairs to extract a (binding) weak opening for each of the w {0,1} vectors.
+The extraction doesn't guarantee they are {0,1} vectors, but checking this was reduced to checking polynomial evaluation, so with all but negl(s) soundness error, vector values are all {0,1}.
+Finally use these w {0,1} vectors to reconstruct (wrt binary decomposition) the original s {0,..,w-1} vectors of 2^w/w^s times the length.
+
+When composing the proof there are log_{2^w/w^s}(n) rounds with n the original vector length.
+Extract using the forking lemma (like in bulletproofs), where the tree has radix 2w and depth no more than log_{2w}(n) to keep the tree size polynomial in s.
+To achieve this depth we need 2^w/w^s >= 2w, that is w >= (s+1)log(w)+1 (log base 2), for which w = 1.5s*log(s) suffices when s > 123.
+So each of the log_{2^w/w^s}(n) rounds the prover sends 1.5s*log(s) commits, along with whatever data is sent in the inner protocol (eg sumcheck) which has its own rounds.
+
+There's a more efficient (and complex) way using RSIS with a cyclotomic polynomial that fully splits, and using Galois-rotated challenges from the paper `practical product proofs.'
+Doing so means inverting perspective of the the commitment scheme, where rather than supporting commits to small norm polynomials, it supports commits to vectors in Z_p which interpolate to small norm polynomials.
+Sampling challenges as done in the paper (maybe room for improvement) leads to log_{ws/4}(n) rounds again sending w commits each round where w = 6*log(s)+26 for s > 35.
