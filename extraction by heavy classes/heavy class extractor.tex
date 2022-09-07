@@ -1,0 +1,271 @@
+This page presents the construction and analysis for a knowledge extractor that is to be used as a subroutine by some other extractor.
+It extracts two solutions related in a particular way, which is of use to the calling-extractor.
+The construction is inspired by a similar method in \cite{Dam10} where it is used in the discrete log setting.
+
+\begin{references}
+    \source{Dam10}
+    \title{On Σ-protocols}
+    \authors{Ivan Damgard}
+    \when{2010}
+    \where{}
+    \other
+    \link{cs.au.dk/~ivan/Sigma.pdf}
+\end{references}
+
+\begin{theorem}{Heavy Class Extractor}
+    The heavy class extractor $HCE(\Sample,\Valid,\Clash)$ is a sub-extractor to be used by other extractors.
+    It serves the purpose of extracting two related solutions, which the calling-extractor can then use as it pleases.
+    The extractor is parameterized as follows.
+    \begin{enumerate}
+        \item
+        Let $S$ be a set on which we have defined a probability distribution as well an equivalence relation $\sim$.
+        We henceforth refer to equivalence classes as simply `classes.'
+        The extractor does not need access to $S$ or $\sim$ but instead interacts with the following helper functions.
+        As such, $S$ and $\sim$ are implicit parameters, hence their absence in the parameter list.
+
+        \item
+        Instead of sampling directly from the distribution on $S$, we sample via the helper function $\Sample\colon S?\to S$ where the optional argument serves as a representative for a class.
+        If an argument $x\in S$ is present, sampling is restricted to the class $C\in S/\sim$ for which $x\in C$.
+        Otherwise, sampling is performed on the entire set $S$.
+
+        We provide the extractor access to $\Sample$ rather than $\sim$ (and thus $S/\sim$) because sampling restricted to a particular class may not be straightforward.
+        Also note that while $\Sample$ is probabilistic, it is a function and not a distribution so in sampling $x$ we write $x=\Sample()$ and not $x\leftarrow\Sample$.
+
+        \item
+        The helper function $\Valid\colon S\to\{0,1\}$ defines an event of `validity,' that is a subset $\Valid(S)\coloneq\{x\in S|\Valid(x)=1\}\subseteq S$ of `valid' outcomes.
+        The goal of the extractor is to find two valid outcomes in the same class, provided those two outcomes don't `clash' as described next.
+
+        \item
+        For each class $C\in S/\sim$ a helper function $\Clash\colon C\times C\to\{0,1\}$ may be invoked.
+        The function defines a symmetric relation (likely but not necessarily an equivalence relation) indicating if two challenges `clash' or if they may serve as solutions.
+        Specifically, two valid outcomes in the same class that don't clash may serve as solutions.
+    \end{enumerate}
+
+    Suppose the following inequalities hold with regard to parameters $\epsilon\in(0,1]$, $\rho\in(0,1)$ and $\sigma\in[\rho,1)$.
+    \begin{gathered}
+        \Pr[\Valid(x)=1|x\leftarrow S] = \epsilon \geq \rho/\sigma \\
+        \forall C\in S/\sim,\forall x\in C,
+            \Pr[\Clash(x,y)|y\leftarrow C] \leq \rho
+    \end{gathered}
+    Then we may construct an extractor that outputs $x,y\in C$ for some $C\in S/\sim$ such that
+    \begin{gathered}
+        \Valid(x) = \Valid(y) = 1 \\
+        \Clash(x,y) = 0
+    \end{gathered}
+    Moreover, the extractor runs in expected time
+    \begin{equation}
+        \frac{\mathcal{O}(1)}{\epsilon}
+    \end{equation}
+
+    \proof
+    We prove the theorem by constructing such an extractor in the sections that follow.
+
+\end{theorem}
+
+We first present a lemma that plays a core role in analysis.
+After presenting the construction of the extractor, we analyze its correctness and expected running time.
+The extractor consists of repeating a subroutine as many times as necessary to succeed.
+We will show the subroutine takes expected time $\mathcal{O}(1/\epsilon)$, and that is succeeds with probability bounded above by some constant. 
+???
+The subroutine must then only be executed an expected constant number of times to succeed, thus preserving the expected time $\mathcal{O}(1/\epsilon)$.
+
+
+\section{Heavy Class Lemma}
+
+Our analysis will center around the following lemma which generalizes that from \cite{Dam10} beyond the special case of $t=1/2$, and beyond the uniform distribution.
+
+\begin{lemma}{Heavy Class Lemma}
+    Consider a set $S$ on which we define a probability distribution as well an equivalence relation $\sim$.
+    Suppose a particular event $E\subseteq S$ occurs with probability $\epsilon$.
+
+    For $t\in[0,1)$, define the \bold{heavy} classes of $S/\sim$ to be those equivalence classes in which $E$ occurs with (conditional) probability more than $\epsilon t$.
+    That is, class $C\in S/\sim$ is heavy if $\Pr[x\in E|x\leftarrow C]>\epsilon t$.
+    Then $E$ occurs in a heavy class with probability at least $(1-t)/(1-\epsilon t)$, that is
+    \begin{equation}
+        \Pr[\text{Heavy}(C)=\text{true}|x\leftarrow E, x\in C\in S/\sim]
+        \geq \frac{1-t}{1-\epsilon t}
+    \end{equation}
+    In other words, with probability at least $(\epsilon-\epsilon t)/(1-\epsilon t)$ a sample $x\leftarrow S$ is both in $E$ and in a heavy class.
+
+    \proof
+    Event $E$ has probability mass $\epsilon$ distributed across $S$.
+    Referring to this `event mass' we will examine how it is distributed with respect to equivalence classes.
+    We aim to show the event mass across heavy classes is at least $(\epsilon-\epsilon t)/(1-\epsilon t)$.
+    Let $\alpha$ be the event mass across heavy classes, and $\beta$ the event mass across non-heavy classes, noting $\alpha+\beta=\epsilon$.
+    That is, let
+    \begin{align}
+        \alpha &\coloneq \Pr[
+            x\in E \land\text{Heavy}(C)=\text{true}
+            |x\leftarrow S, x\in C\in S/\sim
+        ] \\
+        \beta &\coloneq \Pr[
+            x\in E \land\text{Heavy}(C)=\text{false}
+            |x\leftarrow S, x\in C\in S/\sim
+        ]
+    \end{align}
+    By definition of heavy classes, the probability $E$ occurs when restricting to any non-heavy class is at most $\epsilon t$.
+    Therefore the probability $E$ occurs when restricting to the union of all non-heavy classes is also at most $\epsilon t$.
+    We can upper bound the event mass across non-heavy classes as $\beta\leq\epsilon t\mu$ where $\mu$ is the probability mass (not necessarily event mass) across non-heavy classes.
+    Now the event mass across heavy classes is at most all remaining probabiltiy mass, that is $1-\mu$.
+    Thus the event mass across all classes is at most $\epsilon t\mu+(1-\mu)$.
+    With total event mass $\epsilon$ we must have $\epsilon\leq\epsilon t\mu+(1-\mu)$ also written $\mu\leq(1-\epsilon)/(1-\epsilon t)$.
+    The upper bound $\beta\leq\epsilon t\mu\leq\epsilon t(1-\epsilon)/(1-\epsilon t)$ finally implies the lower bound
+    \begin{equation}
+        \alpha = \epsilon - \beta
+        \geq \epsilon - \epsilon t\frac{1-\epsilon}{1-\epsilon t}
+        = \frac{\epsilon - \epsilon t}{1 - \epsilon t}
+    \end{equation}
+\end{lemma}
+
+We will invoke the heavy class lemma substituting identically named $S$ and $\sim$, and substituting $\Valid(S)$ for the event $E$.
+The heavy classes of $S/\sim$ are then well defined with respect to some value $t\in[0,1)$ to be chosen later.
+
+
+\section{Extractor Construction}
+
+The extractor will operate by repeating a subroutine as many times as needed to succeed.
+The subroutine will operate roughly as follows.
+Sample outcomes until finding a valid outcome.
+Then sample other outcomes in the same class for a certain amount of time, such that if the class is heavy we have noticeable probability of finding a valid outcome not clashing with the first, yet if the class is not heavy we don't squander too much time searching.
+We repeat this two step process until succeeding.
+As for how long to search a class before aborting, the time should be proportional to $1/\epsilon$.
+The smaller the probability we succeed, the longer we are allowed to search.
+Thus we would like to sample proportional to $\delta/\epsilon$ times for some constant integer $\delta$ to be chosen later.
+But the value $\epsilon$ is unknown to the extractor, so we cannot compute $\delta/\epsilon$ directly.
+Instead, we will approximate $1/\epsilon$ by sampling random outcomes, and from that approximate $\delta/\epsilon$.
+
+More formally, our subroutine operates as follows.
+\begin{enumerate}
+    \item
+    Sample $x=\Sample()$, then if $\Valid(x)=1$ continue to the next step, otherwise repeat this step.
+
+    \item
+    Sample $y=\Sample()$, and throw a coin that lands heads with probability $1/\delta$ (e.g. a $\delta$-sided die).
+    If $\Valid(y)=1$ and the coin lands heads, abort the subroutine.
+
+    \item
+    Sample $z=\Sample(x)$, then if $\Clash(x,z)=0$ exit with solution $\{x,z\}$, otherwise return to the previous step.
+\end{enumerate}
+
+
+\section{Running Time}
+
+The subroutine operates in expected time $\bigO(1/\epsilon)$.
+The first step takes expected time $1/\epsilon$ since outcome $x\in S$ is valid with probability $\epsilon$.
+The second and third steps each take constant time, and are executed an expected $\delta/\epsilon$ number of times, since the joint probability outcome $y\in S$ is valid and the coin lands heads is $\epsilon\times1/\delta$.
+Therefore the subroutine takes expected time $(1+\delta)/\epsilon$ = $\bigO(1/\epsilon)$.
+
+In the next subsection we will prove the subroutine succeeds with no less than constant probability.
+Therefore, the subroutine need only be run an expected constant number of times (the reciprocal of the success probability) to succeed.
+Thus the extractor's expected running time is $\bigO(1/\epsilon)$.
+
+
+\section{Subroutine Success}
+
+We now prove the subroutine succeeds with probability bounded below by some constant.
+To do so we lower bound the probability of each of the following three events.
+\begin{itemize}
+    \item
+    In the first step, upon finding a valid outcome, that outcome is in a heavy class.
+
+    \item
+    The third step is executed at least $\delta\gamma/\epsilon$ times for some constant $\gamma\in(0,1]$ such that $\delta\gamma\geq1$.
+    That is, the second step doesn't abort for at least $\delta\gamma/\epsilon$ executions.
+    As $\delta\gamma/\epsilon$ is probability fractional we are implicitly speaking of $\floor{\delta\gamma/\epsilon}$ executions, which is non-zero since $\delta\gamma\geq1\geq\epsilon$.
+
+    \item
+    In the case the first valid outcome is in a heavy class, the third step succeeds in finding an valid outcome not clashing with the first after no more than $\delta\gamma/\epsilon\geq1$ executions.
+\end{itemize}
+If all three events occur, the subroutine succeeds.
+Therefore the product of these probabilities lower bounds the probability the subroutine succeeds.
+
+\begin{itemize}
+    \item
+    First we lower bound the probability the first valid outcome in is a heavy class.
+    Recall we \link[previously]{#Heavy-Class-Lemma} defined the heavy classes of $S/\sim$ to be those in which an outcome is valid with (conditional) probability more than $\epsilon t$.
+    The heavy class lemma asserts that on sampling a valid outcome, the outcome is in a heavy class with probability at least $(1-t)/(1-\epsilon t)$.
+    Since $t$ is constrained to the interval $[0,1)$ this probability is non-zero.
+
+    \item
+    Second we must lower bound the probability the third step executes at least $\delta\gamma/\epsilon$ times.
+    To do so we lower bound the probability the second step executes at least $\delta\gamma/\epsilon$ times before aborting.
+    The coin lands heads with probability $1/\delta$, while the outcome is valid with probability $\epsilon$.
+    Both events occur with probability $\epsilon/\delta$, so the probability neither event occurs in the first $\floor{\delta\gamma/\epsilon}$ executions is $(1-\epsilon/\delta)^\floor{\delta\gamma/\epsilon}$ which is larger than the simpler form $(1-\epsilon/\delta)^{\delta\gamma/\epsilon}$ so we consider the latter.
+    Comparing with the function $(1-X)^{\gamma/X}$ for $X$ in $[0,1]$, we observe this expression is a decreasing function of $\epsilon$ with minimum value zero at $\epsilon = \delta$.
+    Therefore the expression is positive for all $\epsilon < \delta$.
+    Since $\epsilon$ is at most $1$, we must constrain $\delta > 1$.
+    The minimum value of this expression (at $\epsilon = 1$) is then $(1-1/\delta)^{\delta\gamma}$.
+
+    \item
+    Third we will lower bound the probability the third step succeeds within $\delta\gamma/\epsilon$ executions assuming the valid outcome $x\in S$ found in the first step is in a heavy class.
+    Suppose $x$ is in heavy class $C\in S/\sim$.
+    The third step samples outcomes from $C$, and by assumption the probability a sampled outcome $y\in C$ clashes with $x\in C$ is at most $\rho$, that is
+    \begin{equation}
+        \Pr[\Clash(x,y)|y\leftarrow C] \leq \rho
+    \end{equation}
+    Also recall that since $C$ is a heavy class, the probability of a valid outcome when sampling from $C$ is more than $\epsilon t$, that is
+    \begin{equation}
+        \Pr[\Valid(y)=1|y\leftarrow C] > \epsilon t
+    \end{equation}
+    Therefore when sampling from $C$, the probability an outcome $y$ is valid but not clashing with $x$ is more than $\epsilon t - \rho$, that is
+    \begin{equation}
+        \Pr[\Valid(y)=1\land\Clash(x,y)=0]|y\leftarrow C]
+        \geq \Pr[\Valid(y)=1|y\leftarrow C] - \Pr[\Clash(x,y)|y\leftarrow C]
+        > \epsilon t - \rho
+    \end{equation}
+    To lower bound the probability the third step succeeds within $\delta\gamma/\epsilon$ executions, we instead upper bound the probability of the complement, that is the probability of failing at least $\delta\gamma/\epsilon$ times which is no more than
+    \begin{equation}
+        \left(1 - (\epsilon t - \rho)\right)^\floor{\delta\gamma/\epsilon}
+    \end{equation}
+    This expression lies below 1 for $\epsilon t > \rho$, thus our constraint on $t$ becomes $t\in(\rho/\epsilon,1)$.
+    The third step then finds a valid, non-clashing outcome with probability at least
+    \begin{equation}
+        1 - \left(1 - (\epsilon t - \rho)\right)^\floor{\delta\gamma/\epsilon}
+    \end{equation}
+\end{itemize}
+
+We take the product of the three lower bounds established above to lower bound the probability they all occur.
+Thus the subroutine succeeds with probability at least
+\begin{equation}
+    \frac{1-t}{1-\epsilon t}\cdot
+    \left(1-\frac{1}{\delta}\right)^{\delta\gamma}\cdot
+    \left(1 - \left(1 - (\epsilon t - \rho)\right)^\floor{\delta\gamma/\epsilon}\right)
+\end{equation}
+Recall our constraints to ensure the probability is non-zero are $\delta > 1$, $\gamma\in(0,1]$, $\delta\gamma\geq1$, and $t\in(\rho/\epsilon,1)$.
+
+While the second component is clearly a constant, we must lower bound the first and third probabilities by constants since they depend on non-constant values $\epsilon$ and $\rho$.
+As $t$ is constrained to $(\rho/\epsilon,1)$, suppose we choose $t\coloneq\rho/\epsilon+\alpha$ for a constant $\alpha\in(0,1-\rho/\epsilon)$.
+Then the first component $(1-t)/(1-\epsilon t)$ becomes an increasing function of $\epsilon$.
+Plugging in $\rho/\sigma$ for $\epsilon$ we conclude that for all $\epsilon\geq\rho/\sigma$ the component reduces to constant value at least
+\begin{equation}
+    \frac{1 - (\sigma + \alpha)}{1 - \rho(\sigma + \alpha)/\sigma}
+\end{equation}
+To ensure this value is non-zero we must further constrain $\alpha$ to the interval $(0,1-\sigma)$ noting this is a subinterval of $(0,1-\rho/\epsilon)$  by the assumption $\epsilon\geq\rho/\sigma$.
+This value is an increasing function of $\rho$ with minimum value $1-(\sigma+\alpha)$ at $\rho=0$.
+Smaller values of $\alpha$ yield larger probability values.
+
+Now with our choice of $t=\rho/\epsilon+\alpha$ the third component reduces as
+\begin{equation}
+    1 - \left(1 - (\epsilon t - \rho)\right)^\floor{\delta\gamma/\epsilon}
+    = 1 - \left(1 - \epsilon\alpha\right)^\floor{\delta\gamma/\epsilon}
+\end{equation}
+Lower bounding the exponent $\floor{\delta\gamma/\epsilon}$ as 
+\begin{equation}
+    \floor{\delta\gamma/\epsilon}
+    = \floor{(1/\epsilon\alpha)\times(\delta\gamma\alpha)}
+    \geq \floor{1/\epsilon\alpha}\times\floor{\delta\gamma\alpha}
+\end{equation}
+and taking advantage of the identity
+\begin{equation}
+    (1-X)^\floor{1/X} < 1/2 \text{ for } X\in[0,1]
+\end{equation}
+the third component is lower bounded by $1-1/2^\floor{\delta\gamma\alpha}$.
+In contrast to the first component, \emph{larger} values of $\alpha$ yield larger probability values.
+One may choose an optimal value for $\alpha$ depending on the values of $\sigma$, $\delta$ and $\gamma$.
+
+Finally the total lower bound becomes the constant
+\begin{equation}
+    \left(1 - (\sigma + \alpha)\right)\cdot
+    \left(1-\frac{1}{\delta}\right)^{\delta\gamma}\cdot
+    \left(1 - \frac{1}{2^\floor{\delta\gamma\alpha}}\right)
+\end{equation}
