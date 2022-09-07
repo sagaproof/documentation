@@ -18,7 +18,7 @@
         \begin{itemize}[square]
             \bold{Decompose:}
             \item
-            \bold{Input:} polynomial $t$. Let $n_t=\det(t)+1$
+            \bold{Input:} polynomial $t$. Let $n_t=\deg(t)+1$
             \item
             \bold{Output:} polynomials $t^{(0)},\dots,t^{(\ceil{n_t/\eta}-1)}$ with $\deg(t^{(i)})<\deg(\eta)$ for all $i$ such that
             \begin{align}
@@ -33,7 +33,7 @@
         \item
         If $\deg(t)<\deg(\eta)$ output $t^{(0)}\coloneqq t$.
         Otherwise, divide $t$ by $\eta$ to get quotient $q$ and remainder $r$ with $\deg(r)<\eta$.
-        Note $\deg(q)+\det(\eta) = \deg(t)$, and that zero-divisors do not spoil division since $\eta$ is monic.
+        Note $\deg(q)+\deg(\eta) = \deg(t)$, and that zero-divisors do not spoil division since $\eta$ is monic.
 
         If $\eta$ is a monomial then the coefficients of $t$ will be distributed among $q$ and $r$ as
         \begin{align}
@@ -42,17 +42,17 @@
         \end{align}
 
         \item
-        Let $n_q=\det(q)+1$.
-        Invoke \bold{Decompose} on $q$ to get $q^{(0)},\dots,q^{(\ceil{n_q/\deg(\eta)}-1)}$ with $\deg(q^{(i)})<\det(\eta)$ for all $i$.
+        Let $n_q=\deg(q)+1$.
+        Invoke \bold{Decompose} on $q$ to get $q^{(0)},\dots,q^{(\ceil{n_q/\deg(\eta)}-1)}$ with $\deg(q^{(i)})<\deg(\eta)$ for all $i$.
 
         \item
         For $\alpha\in\R$ we have the identity $\floor{\alpha-1} = \floor{\alpha}-1$, from which we infer
         \begin{align}
-            &\deg(q)+\deg(\eta)=\det(t) \\
+            &\deg(q)+\deg(\eta)=\deg(t) \\
             &\implies n_q = n_t-\deg(\eta) \\
             &\implies \ceil{\frac{n_q}{\deg(\eta)}}
                 = \ceil{\frac{n_t}{\deg(\eta)}-1}
-                = \ceil{\frac{n_t}{\det(\eta)}}-1
+                = \ceil{\frac{n_t}{\deg(\eta)}}-1
         \end{align}
         Now $t$ may be expressed as
         \begin{align}
@@ -60,7 +60,7 @@
             &= r(x) + \eta(x)q(x) \\
             &= r(x) + \eta(x)\sum_{i=0}^{\ceil{n_q/\deg(\eta)}-1} q^{(i)}(x)\eta(x)^i \\
             &= r(x) + \sum_{i=1}^{\ceil{n_q/\deg(\eta)}} q^{(i-1)}(x)\eta(x)^i \\
-            &= \sum_{i=0}^{\ceil{n_t/\det(\eta)}-1} t^{(i)}(x)\eta(x)^i
+            &= \sum_{i=0}^{\ceil{n_t/\deg(\eta)}-1} t^{(i)}(x)\eta(x)^i
         \end{align}
         Where in the last expression we assigned $t^{(0)},\dots,t^{(\ceil{n_t/\eta}-1)} \coloneqq r,q^{(0)},\dots,q^{(\ceil{n_q/\eta}-1)}$.
         Thus the decomposition satisfies the promised general form.

@@ -1,0 +1,355 @@
+
+\begin{define}
+    \newcommand\O{\mathcal{O}}
+    \def\i#1{\mathfrak{#1}}
+    \def\bar#1{\overline{#1}}
+\end{define}
+
+This page examines a certain kind of ring in three sections of increasing specificity.
+The kind of ring of interest may seem rather arbitrary, but such rings are a central topic in algebraic number theory.
+For ring of integers $\O_L$ of number field $L$, our ring of interest is $\O_L/\i{p}\O_L$ where $\i{p}$ is a prime ideal of the ring of integers $\O_K$ of some number field $K$ contained in $L$.
+The nature of this ring is largely determined by how the ideal $\i{p}\subseteq\O_K$ splits into prime ideals in $\O_L$, and indeed that turns out to be the core topic of our investigation.
+
+In the first section we present definitions and basic results for the general case of number fields $K$ and $L$ in which we assume nothing particular about the extension $L/K$.
+Here we will make use of the Chinese Remainder Theorem covered in \link[reducibility and CRT]{&reducibility and CRT}.
+In the second section we focus on the special case that the extension $L/K$ is Galois.
+The increased specificity yields certain simplifications, but those simplifications yield additional definitions and concepts to cover.
+In the third section we further specialize to the case that $K=\Q$ and $L=\Q[X]/\Phi_n(X)$, that is when $L/K$ is an $n$'th cyclotomic extension.
+Here we will make use of the reducibility of cyclotomic polynomials covered in \link[reducibility and CRT]{&reducibility and CRT}.
+In all sections we make claims standard to algebraic number theory without providing proof.
+For proofs one may consult books such as \cite{Mil20} and \cite{Mar18}.
+
+\begin{references}
+    \source{Mar18}
+    \title{Number Fields}
+    \authors{Daniel A. Marcus}
+    \when{2018}
+    \where{}
+    \other
+    \link[book]{www.math.toronto.edu/~ila/2018_Book_NumberFields.pdf}
+
+    \source{Mil20}
+    \title{Algebraic Number Theory}
+    \authors{James S. Milne}
+    \when{2020}
+    \where{jmilne.org/math}
+    \other
+    \link[book]{jmilne.org/math/CourseNotes/ANTc.pdf}
+\end{references}
+
+
+\section{The general case}
+
+Let $K$ and $L$ be number fields with corresponding rings of integers $\O_K$ and $\O_L$, and consider the extension $L/K$.
+Rings of integers of number fields are `Dedekind domains,' those are integral domains in which every (non-zero and proper) ideal factors into a (unique) product of prime ideals.
+Moreover, every prime ideal in a Dedekind domain is maximal.
+\begin{note}
+    To say an ideal $\i{a}$ divides an ideal $\i{b}$ is to say there exists a quotient ideal $\i{q}$ such that $\i{a}\i{q}=\i{b}$.
+    This is equivalent to the statement $\i{a}\supseteq\i{b}$.
+    If it's counter-intuitive that the divisor is larger than the dividend, consider how ideals in $\Z$ are multiples of integers, so the smaller the integer the larger the ideal.
+\end{note}
+
+Let $\i{p}$ be an ideal in $\O_K$, and note that $\i{p}\O_K$ is an ideal in $\O_L$.
+We say a prime ideal $\i{P}$ in $\O_L$ \emph{lies over} $\i{p}$ (or $\i{p}$ \emph{lies under} $\i{P}$) if $\i{P}|\i{p}\O_K$ (or we abuse notation and write $\i{P}|\i{p}$ and refer to prime ideals as `primes').
+Every prime $\i{p}\subseteq\O_K$ lies under some prime $\i{P}\subseteq\O_L$, and every prime $\i{P}\subseteq\O_L$ lies over some \emph{unique} prime $\i{p}\subseteq\O_K$.
+
+Continuing with $\i{P}$ and $\i{p}$, since they are prime and thus maximal ideals, the quotient rings $\O_L/\i{P}$ and $\O_K/\i{p}$ are fields (and in fact finite).
+This is because for any commutative ring $R$, an ideal $I$ is maximal if and only if $R/I$ is a field.
+Moreover, since $\i{P}\subseteq\i{p}\O_L$ the field $\O_L/\i{P}$ is a finite field extension of $\O_K/\i{p}$.
+The degree of the field extension $[\O_L/\i{P}:\O_K/\i{p}]$ is the \emph{inertia degree} of $\i{P}$ over $\i{p}$, and denoted $f(\i{P}|\i{p})$.
+
+Suppose the ideal $\i{p}\O_L\subseteq\O_L$ has unique prime factorization
+\begin{equation}
+    \i{p}\O_L = \prod_{i=1}^g \i{P}_i^{e_i}
+\end{equation}
+The exponents $e_i$ are called \emph{ramification indices}, and the \emph{ramification index} $e_i$ of $\i{P}_i$ over $\i{p}$ is denoted $e(\i{P}_i|\i{p})=e_i$.
+Likewise we have the inertia degree $f_i$ of $\i{P}_i$ over $\i{p}$ as $f(\i{P}_i|\i{p})=[\O_L/\i{P}_i:\O_K/\i{p}]$.
+The ramification indices and inertia degrees of the factorization satisfy the fundamental relation
+\begin{equation}
+    \sum_{i=1}^g e_if_i
+    = \sum_{i=1}^g e(\i{P}_i|\i{p})f(\i{P}_i|\i{p})
+    = \sum_{\i{P}|\i{p}} e(\i{P}|\i{p})f(\i{P}|\i{p})
+    = [L:K]
+\end{equation}
+Several definitions describe the nature of the factorization:
+\begin{itemize}
+    \item
+    If $e_i > 1$ we say $\i{p}$ \emph{ramifies} in $L$, and more specifically $\i{P}_i$ is \emph{ramified} over $\i{p}$.
+    Otherwise, with all $e_i=1$ we say $\i{p}$ is \emph{unramified} in $L$.
+    \item
+    If $g=[L:K]$ (in which case $e_i,f_i=1$) we say $\i{p}$ \emph{splits completely} (or is \emph{totally split}) in $L$.   
+    \item
+    If $g=1$, then in the case $e_1=1$ we say $\i{p}$ is \emph{inert} in $L$, while in the case $f_1=1$ we say $\i{p}$ is \emph{totally ramified} in $L$.
+\end{itemize}
+
+Having introduced the setting, in the two subsections that follow we will introduce two basic results.
+The first result is how one may go about finding the prime factors of $\i{p}\O_L$making a weak assumption on $\i{p}$.
+The second result is how one may represent our ring of interest $\O_L/\i{p}\O_L$ having found the prime factors of $\i{p}\O_L$.
+
+
+\subsection{Finding the factors}
+
+We present a common technique for finding the prime factorization of prime ideal $\i{p}\in\O_K$ in terms of prime ideals of $\O_L$.
+First we must fix some $\alpha\in\O_L$ such that $L=K[\alpha]\cong K[X]/(h(x))$where $h\in K[X]$ is the minimal polynomial of $\alpha$ over $K$.
+Then $\O_K[\alpha]$ is a subring of $\O_L$ with finite index $[\O_L:\O_K[\alpha]]$.
+This technique for factoring $\i{p}$  in $\O_L$ works provided the prime integer that lies under $\i{p}$ does not divide $[\O_L:\O_K[\alpha]]$.
+
+Now $h$, while defined in $K[X]$, is actually in $\O_K[X]$ because $\alpha\in\O_K$ is the root of some polynomial in $\Z[X]$ divisible by $h\in K[X]$ which prevents $h$ from having coefficients in $K\setminus\O_K$.
+Suppose $\bar{h}=h(\bmod\i{p})$ factors over $\O_K/\i{p}$ as
+\begin{equation}
+    \bar{h}(X) = \prod_{i=1}^g \bar{h_i}(X)^{e_i} \mod\i{p}
+\end{equation}
+where $\bar{h_i}$ are distinct, monic, and irreducible in $(\O_K/\i{p})[X]$.
+Then the prime decomposition of $\i{p}$ in $\O_L$ is
+\begin{equation}
+    \i{p}\O_L = \prod_{i=1}^g \i{P}_i^{e_i}
+\end{equation}
+where $\i{P}_i = (\i{p},h_i(\alpha)) = \i{p}\O_L + h_i(\alpha)\O_L$ is the ideal in $\O_L$ generated by $\i{p}$ and $h_i(\alpha)$.
+Moreover, we have the following field isomorphism
+\begin{equation}
+    \frac{\O_L}{(\i{p},h_i(\alpha))}\cong\frac{(\O_K/\i{p})[X]}{(\bar{h_i}(X))}
+\end{equation}
+The inertia degree $f(\i{P}_i|\i{p})=[\O_L/\i{P}_i:\O_K/\i{p}]$ is then seen to be $\deg(\bar{h_i}) = \deg(h_i)$.
+
+
+\subsection{Using the Chinese Remainder Theorem}
+
+We will now exploit prime factorization to invoke the \link[Chinese Remainder Theorem]{&reducibility and CRT#Chinese Remainder Theorem}.
+Since each $\i{P}_i$ in the factorization is maximal, so are the powers $\i{P}_i^{e_i}$.
+That is, if ideals $I$ and $J$ are coprime ($I+J=R$) then so are their powers ($I^k+J^{k'}=R$).
+Suppose otherwise, that there exists some maximal ideal $K$ such that $I^k+J^{k'}=K$.
+Then since $I$ (or argue using $J$) is prime, $I^k\subseteq K$ implies $I\subseteq K$ which contradicts the maximality of $I$.
+The criteria for the Chinese Remainder Theorem requires that the ideals $\i{P}_i^{e_i}$ be coprime.
+For this we use the fact that any two distinct, maximal ideals are coprime.
+For justification, note that if $I$ and $J$ are distinct, maximal ideals, then $I+J$ is an ideal larger than both $I$ and $J$ and hence must be the full ring.
+Now we may invoke the Chinese Remainder Theorem for the ring $\O_L/\i{p}\O_L$.
+\begin{equation}
+    \O_L/\i{p}\O_L
+    = \O_L\Big/\prod_{i=1}^g \i{P}_i^{e_i}
+    \cong \prod_{i=1}^g \O_L/\i{P}_i^{e_i}
+\end{equation}
+
+Consider what this looks like having used the \link[previous method]{#Finding the factors} of factorizing $\i{p}\O_L$:
+\begin{equation}
+    \frac{\O_L}{\i{p}\O_L}
+    \cong \prod_{i=1}^g \frac{\O_L}{(\i{p},h_i(\alpha))^{e_i}}
+    \cong \prod_{i=1}^g \frac{(\O_K/\i{p})[X]}{(\bar{h_i}(X))^{e_i}}
+\end{equation}
+
+
+\section{The Galois case}
+
+Continuing with $L/K$ and the factorization of $\i{p}\O_L$ into primes $\i{P}_i$, the ramification indices and inertia degrees are simple in the case that $L/K$ is Galois.
+In particular, all $e_i=e$ are equal, and all $f_i=f$ are equal, and as such, the fundamental relation becomes
+\begin{equation}
+    efg = [L:K]
+\end{equation}
+Since automorphisms on $L$ induce automorphisms on subrings, we have $\sigma(\O_L)=\O_L$ for any $\sigma\in\Gal(L/K)$.
+Also noting that $\sigma(\i{p})=\i{p}$ because $\sigma$ fixes $K$, we may apply $\sigma$ to the prime decomposition of $\i{p}\O_L$ to get
+\begin{equation}
+    \i{p}\O_L = \sigma(\i{p}\O_L) = \prod_{i=1}^g \sigma(\i{P}_i)^e
+\end{equation}
+As an automorphism, $\sigma$ maps prime ideals to prime ideal, so $\{\sigma(\i{P}_i)\}_{i\in[g]}$ must be the unique prime factorization of $\i{p}\O_L$ and thus coincide with $\{\i{P}_i\}_{i\in[g]}$.
+In other words, $\sigma$ acts on the prime ideals by permuting them.
+Moreover, the action is \emph{transitive}, meaning for every two prime ideals $\i{P}_i$ and $\i{P}_{i'}$ lying over $\i{p}$ there exists some $\sigma\in\Gal(L/K)$ such that $\sigma(\i{P}_i)=\i{P}_{i'}$.
+Furthermore, to say the action is \emph{simply transitive} is to say there exists a unique such $\sigma$.
+
+For some prime ideal $\i{P}\subseteq\O_L$ the \emph{decomposition group} of $\i{P}$ is the subgroup of $\Gal(L/K)$ that fixes $\i{P}$, that is
+\begin{equation}
+    D(\i{P}) = \{\sigma\in\Gal(L/K)\mid\sigma(\i{P})=\i{P}\}
+\end{equation}
+As with every Galois subgroup there is an associated field, the field that is fixed by exactly the automorphisms of the subgroup.
+The \emph{decomposition field} associated with $D(\i{P})$ is
+\begin{equation}
+    L_D(\i{P}) = \{x\in L\mid\forall\sigma\in D(\i{P}),\ \sigma(x)=x\}
+\end{equation}
+
+In the case $\sigma\in D(\i{P})$, since $\sigma$ is invariant on $\i{P}$ and thus its cosets, we may consider $\bar{\sigma} = \sigma(\bmod\i{P})$ as an automorphism on $\O_L/\i{P}$.
+Note by fixing $K$, any $\sigma\in\Gal(L/K)$ also fixes $\O_K/\i{p}$.
+Therefore, with any $\sigma\in D(\i{P})$ inducing an automorphism on $\O_L/\i{P}$ that fixes subfield $\O_K/\i{p}$, we have the natural map $D(\i{P})\to\Gal((\O_L/\i{P})/(\O_K/\i{p}))$ defined as $\sigma\to\bar{\sigma}$.
+The kernel of this homomorphism, a subgroup of $D(\i{P})$, is referred to as the \emph{inertia} group of $\i{P}$, and takes the form
+\begin{equation}
+    E(\i{B}) = \{
+        \sigma\in D(\i{P})\mid\forall x\in\O_L,\ \sigma(x)\equiv x\mod\i{P}
+    \}
+\end{equation}
+Analogous to the decomposition field, we define the \emph{inertia field} associated with $E(\i{P})$ as
+\begin{equation}
+    L_E(\i{P}) = \{x\in L\mid\forall\sigma\in E(\i{P}),\ \sigma(x)=x\}
+\end{equation}
+
+The natural map from $D(\i{P})$ to $\Gal((\O_L/\i{P})/(\O_K/\i{p}))$ is actually surjective, and thus we have a group isomorphism $D(\i{P})/E(\i{P})\cong\Gal((\O_L/\i{P})/(\O_K/\i{p}))$.
+Since the latter Galois group is cyclic and generated by the Frobenius element, so is $D(\i{P})/E(\i{P})$ and we denote it as $F(\i{P})$.
+We have the following automorphism group orders:
+\begin{itemize}
+    \item
+    $|\Gal(L/K)| = e(\i{P}|\i{p})f(\i{P}|\i{p})g$
+    \item
+    $|D(\i{P})| = e(\i{P}|\i{p})f(\i{P}|\i{p})$
+    \item
+    $|E(\i{P})| = e(\i{P}|\i{p})$
+    \item
+    $|F(\i{P})| = f(\i{P}|\i{p})$
+\end{itemize}
+The following diagram illustrates the changes in ramification indices and inertia degrees as we step through the fields from $K$ to $L$.
+\begin{CD}
+    @. L @. \i{P} \\
+    [L:L_E]=e @| @| e(\i{P}|\i{P}\cap L_E)=e(\i{P}|\i{p}) @. f(\i{P}|\i{P}\cap L_E)=1 \\
+    @. L_E @. \i{P}\cap L_E \\
+    [L_E:L_D]=f @| @| e(\i{P}\cap L_E|\i{P}\cap L_D)=1 @. f(\i{P}\cap L_E|\i{P}\cap L_D)=f(\i{P}|\i{p}) \\
+    @. L_D @. \i{P}\cap L_D \\
+    [L_D:K]=g @| @| e(\i{P}\cap L_D|\i{p})=1 @. f(\i{P}\cap L_D|\i{p})=1 \\
+    @. K @. \i{p}
+\end{CD}
+The word `decomposition' reflects how in the bottom layer the prime decomposes into $g$ parts.
+The word `inertia' reflects how in the middle layer the prime remains inert with inertia degree $1$, not ramifying until the top layer.
+
+
+\subsection{The abelian Galois case}
+
+In the case that the Galois group is abelian, the decomposition groups for all $\i{P}_i$ lying over $\i{p}$ coincide.
+Let $\i{P}$ be any such $\i{P}_i$.
+It suffices to show that $D(\i{P})=D(\tau(\i{P}))$ for all $\tau$ in the Galois group.
+This is because by the transitivity of the Galois action every prime lying above $\i{p}$ takes the form $\tau(\i{P})$ for some $\tau$.
+Equality of $D(\i{P})$ and $D(\tau(\i{P}))$ is seen set-membership-wise as
+\begin{align}
+    &\sigma\in D(\tau(\i{P})) \\
+    &\iff \sigma(\tau(\i{P}))=\tau(\i{P}) \\
+    &\iff (\tau^{-1}\circ\sigma\circ\tau)(\i{P}) = \i{P} \\
+    &\iff \sigma(\i{P}) = \i{P} \\
+    &\iff \sigma\in D(\i{P})
+\end{align}
+
+Since all decomposition groups $D(\i{P}_i)$ are the same (normal) subgroup of $\Gal(L/K)$, we may consider the quotient group $\Gal(L/K)/D(\i{P})$ of order $efg/ef=g$ where $\i{P}$ is again any $\i{P}_i$.
+We will now show that this quotient group acts simply transitively on the primes lying above $\i{p}$.
+To do so we show that the map $\sigma\to\sigma(\i{P})$ with domain $\Gal(L/K)/D(\i{P})$ is injective, hence for each prime $\i{P}'$ lying above $\i{p}$ there is a unique $\sigma\in\Gal(L/K)/D(\i{P})$ such that $\sigma(\i{P})=\i{P}'$.
+For two cosets $\tau\circ D(\i{P})$ and $\tau'\circ D(\i{P})$ had by some coset representatives $\tau$ and $\tau'$ we have
+\begin{align}
+    &(\tau'\circ D)(\i{P}) = (\tau\circ D)(\i{P}) \\
+    &\implies \tau'(D(\i{P})) = \tau(D(\i{P})) \\
+    &\implies \tau'(\i{P}) = \tau(\i{P}) \\
+    &\implies (\tau^{-1}\circ\tau')(\i{P})=\i{P} \\
+    &\implies \tau^{-1}\circ\tau'\in D(\i{P})
+\end{align}
+and hence by the equivalence relation of cosets $\tau$ and $\tau'$ belong to the same coset.
+
+The simple transitivity of $\Gal(L/K)/D(\i{P})$ allows us to express the prime factorization of $\i{p}\O_L$ as
+\begin{equation}
+    \i{p}\O_L =
+    \prod_{\sigma\in\Gal(L/K)/D(\i{P})} \sigma(\i{P})^e
+\end{equation}
+and along with the Chinese Remainder Theorem we may write our ring of interest as
+\begin{align}
+    \O_L/\i{p}\O_L\cong
+    \prod_{\sigma\in\Gal(L/K)/D(\i{P})} \O_L/\sigma(\i{P})^e
+\end{align}
+
+
+\section{The cyclotomic case}
+
+We will now examine the special case of cyclotomic fields, that is number fields of the form $L=\Q(\mu_n)$ (extending $K=\Q$) where $\mu_n$ are the $n$'th complex roots of unity.
+The extension $L/K=\Q(\mu_n)/\Q$ is Galois, and we briefly examined such extensions on the page \link[cyclotomic extensions]{&cyclotomic extensions}.
+The minimal polynomial over $\Q$ of the generators of $\mu_n$ (the primitive $n$'th complex roots of unity) is $\Phi_n$, the $n$'th cyclotomic polynomial.
+The ring of integers of $\Q$ is $\Z$, and the ring of integers of $\Q(\mu_n)$ turns out to be $\Z[\mu_n]$.
+
+\begin{remark}
+    For a ring $R$ the notations $R[\alpha]$ and $R(\alpha)$ indeed carry different meanings, though they coincide in certain cases.
+    The ring $R[\alpha]$ denotes the ring had by adjoining $\alpha$ to $R$, which is the smallest \emph{ring} containing both $\alpha$ and $R$.
+    The ring $R(\alpha)$, only really used when $R$ is a field, denotes the ring had by adjoining $\alpha$ \emph{and} $1/\alpha$ to $R$, that is the smallest \emph{field} containing both $\alpha$ and $R$.
+
+    If $\alpha$ is the root of some polynomial $h$ over $R$ with invertible constant coefficient, then $1/\alpha$ exists in $R[\alpha]$ and thus $R[\alpha]=R(\alpha)$ since
+    \begin{equation}
+        \alpha\cdot\frac{h_{\deg(h)}\alpha^{\deg(h)-1}+\dots+h_1}{-h_0}=1
+    \end{equation}
+    Therefore in the case that $R$ is a field, the two notations coincide if and only if $\alpha$ is algebraic over $R$.
+\end{remark}
+In our case, since $\Q$ is a field and $\mu_n$ vanishes on $\Phi_n\in\Q[X]$ we have $\Q[\mu_n]=\Q(\mu_n)$, while on the other hand $\Z[\mu_n]\neq\Z(\mu_n)$.
+
+Recall our goal here is to investigate the ring $\O_L/\i{p}\O_L$ where $\i{p}$ is a prime ideal of $\O_K$.
+In the cyclotomic case, since $\O_K=\Z$ we have $\i{p}=(p)\subseteq\Z$ generated by some prime number $p\in\Z$.
+Our ring of interest is then $\Z[\mu_n]/(p)\Z[\mu_n]$.
+To clarify, we have the following correspondences:
+\begin{itemize}
+    \item
+    \bold{Number fields:} $K=\Q$ and $L=\Q(\mu_n)$
+    \item
+    \bold{Rings of integers:} $\O_K=\Z$ and $\O_L=\Z[\mu_n]$.
+    \item
+    \bold{Primes:} $\i{p}=(p)\subseteq\Z$ for some prime number $p\in\Z$, and the primes $\i{P}_i\subseteq\Z[\mu_n]$ lying above $\i{p}$ will be found in the following subsection.
+\end{itemize}
+
+
+\subsection{Cyclotomics as a general case}
+
+Now we apply the tools from \link[the general case]{#the general case} to the cyclotomic case, namely how to find the prime factors of $(p)\Z[\mu_n]$ and how to represent $\Z[\mu_n]/(p)\Z[\mu_n]$ in terms of those prime factors using the Chinese Remainder Theorem.
+
+To find the factorization of prime ideal $\i{p}=(p)\in\O_K$ into prime ideals of $\O_L=\Z[\mu_n]$, we will use the method presented \link[above]{#finding the factors}.
+First we fix some primitive $n$'th root of unity $\alpha\in\mu_n$.
+Then we have $L=\Q(\alpha)=\Q[\alpha]=K[\alpha]$ since $L$ is an algebraic extension of $K$.
+Furthermore, we have the isomorphism $\Q(\alpha)\cong\Q[X]/(\Phi_n(X))$.
+To complete the criteria for using the method, note that $p$ (the prime number lying under $(p)$) does not divide $[\O_L:\O_K[\alpha]] = [\Z[\alpha]:\Z[\alpha]]=1$.
+
+We know from the \link[reducibility of cyclotomic polynomials over finite fields]{&reducibility and CRT#reducibility of Phi_n over F_q w.r.t. m} that $\Phi_n$ over the finite field $\O_K/\i{p}=\Z/(p)$ factors into irreducibles as
+\begin{equation}
+    \Phi_n(X) \mod (p) = \prod_{i=1}^{\phi(r)} (X^{n/r}-\zeta_i) \mod (p)
+\end{equation}
+where $\zeta_i$ are the primitive $r$'th roots of unity in the group $(\Z/(p))^\times$ for $r=n/\ord_n(p)$.
+The method then yields the prime ideal decomposition of $(p)$ in $\Z[\alpha]$ as
+\begin{equation}
+    (p)\Z[\alpha] = \prod_{i=1}^{\phi(r)} \big(p,\alpha^{n/r}-\zeta_i\big)
+\end{equation}
+That is, $(p)\Z[\alpha]$ splits completely into prime ideals generated by both $p$ and $\alpha^{n/r}-\zeta_i$ which we denote $\i{P}_i=(p,\alpha^{n/r}-\zeta_i)$.
+Moreover, the finite field $\Z[\alpha]/(p,\alpha^{n/r}-\zeta_i)$ is isomorphic to $(\Z/(p))[X]/(X^{n/r}-\zeta_i)$ and hence $f((p,X^{n/r}-\zeta_i)|(p))=\deg(X^{n/r}-\zeta_i)=\ord_n(p)$.
+Notice how these inertia degrees are $\i{P}$-invariant, and also notice how the ramification indices are also $\i{P}$-invariant as $(p)\Z[\alpha]$ splits completely.
+Recall that these invariants are expected since we are in a Galois extension.
+
+We may use this prime factorization to apply the Chinese Remainder Theorem and express our ring of interest as
+\begin{equation}
+    \frac{\Z[\mu_n]}{(p)\Z[\mu_n]}
+    \cong\prod_{i=1}^{\phi(r)} \frac{\Z[\alpha]}{(p,\alpha^{n/r}-\zeta_i)}
+    \cong\prod_{i=1}^{\phi(r)} \frac{(\Z/(p))[X]}{(X^{n/r}-\zeta_i)}
+\end{equation}
+This is a special case of the more general result for \link[representing $\F_q[X]/\Phi_n(X)$]{&reducibility and CRT#An example representing F_q[X]/Phi_n(X)}.
+
+
+\subsection{Cyclotomics as a Galois case}
+
+Lastly we apply the tools from \link[the Galois case]{#the Galois case} to the cyclotomic case.
+Keep in mind throughout that $\i{P}_i=(p,X^{n/r}-\zeta_i)$.
+As expected, we observed in the previous subsection that all inertia degrees and ramification indices coincide.
+The fundamental identity in the cyclotomic case becomes
+\begin{equation}
+    efg = 1\cdot\ord_n(p)\cdot\phi(n/\ord_n(p)) = \phi(n) = [\Q(\mu_n)):\Q]
+\end{equation}
+Moreover, our list of automorphism group orders becomes
+\begin{itemize}
+    \item
+    $|\Gal(\Q(\mu_n)/\Q))|=efg=\phi(n)$
+    \item
+    $|D(\i{P}_i)|=ef=1\cdot\ord_n(p)=\ord_n(p)$
+    \item
+    $|E(\i{P}_i)|=e=1$
+    \item
+    $|F(\i{P}_i)|=f=\ord_n(p)$
+\end{itemize}
+Recall that the natural map $\sigma\to\sigma(\bmod(p))$ from $F(\i{P}_i)\coloneqq D(\i{P}_i)/E(\i{P}_i)$ to $\Gal((\Z[\mu_n]/\i{P}_i)/(\Z/(p)))$ is surjective.
+Since $E(\i{P}_i)$ is the trivial group with order $1$, the natural map is in fact an isomorphism between $D(\i{P}_i)$ and $\Gal((\Z[\mu_n]/\i{P}_i)/(\Z/(p)))$.
+As listed above, $D(\i{P}_i)$ has order $\ord_n(p)$, and as a subgroup of $\Gal(\Q(\mu_n)/\Q)$ it is isomorphic to a subgroup of $(\Z/(n))^\times$.
+With these constraints in mind, we may guess that $D(\i{P}_i)$ is isomorphic to the subgroup of $(\Z/(n))^\times$ generated by $p$, which we denote $\left<p\right>$.
+Indeed, from the theory of finite fields we know the Frobenius automorphism $x\to x^p$ generates the Galois group of any finite field extension.
+
+Since the Galois group is abelian (as it's isomorphic to $(\Z/(n))^\times$), we may use \link[our previous reasoning]{#the abelian Galois case} to express the prime factorization in terms of a single prime as
+\begin{equation}
+    (p)\Z[\mu_n] =
+    \prod_{\sigma\in\Gal(\Q(\mu_n)/\Q)/D(\i{P})} \sigma((p,X^{n/r}-\zeta))
+\end{equation}
+where $\zeta$ is any primitive $(n/\ord_n(p))$'th root of unity in the group $(\Z/(p))^\times$, and $\i{P}$ is any of the primes $\i{P}_i$.
+Once again using the Chinese Remainder Theorem we may write our ring of interest as
+\begin{equation}
+    \frac{\Z[\mu_n]}{(p)\Z[\mu_n]}
+    \cong\prod_{\sigma\in\Gal(\Q(\mu_n)/\Q)/D(\i{P})}
+        \frac{\Z[\alpha]}{\sigma((p,\alpha^{n/r}-\zeta))}
+    \cong\prod_{\sigma\in\Gal(\Q(\mu_n)/\Q)/D(\i{P})}
+        \frac{(\Z[\mu_n]/(p))[X]}{\sigma((X^{n/r}-\zeta))}
+\end{equation}
+where for the last isomorphism we use the fact that $\sigma((p,\alpha^{n/r}-\zeta))=(p,\sigma(\alpha^{n/r}-\zeta))$ since $\sigma$ fixes $p\in\Q$.

@@ -1,0 +1,239 @@
+
+This page is dedicated to presenting two auxiliary notions that will play a role in investigating \link[our ring of interest]{&our ring of interest}.
+In the first section we present how cyclotomic polynomials split over finite fields.
+In the second section we present the Chinese Remainder Theorem.
+In the third section we show how the tools from the previous two sections can be combined, though at the moment in this project we have no relevant context in which to apply this result.
+
+
+\section[Representation of Phi_n over F_q]{Representation of $\Phi_n$ over $\F_q$}
+
+In this section we introduce the Möbius function along with its inversion formula, then show how it can be used to represent the $n$'th cyclotomic polynomial.
+Using this representation, we can represent one cyclotomic polynomial in terms of another.
+We exploit this relationship to arrive at our primary result for this section, that is how cyclotomic polynomials can split over finite fields in any number of related ways (the factors not always irreducible).
+We now proceed through these parts one after the other with no interleaving commentary.
+
+\begin{definition}{Möbius function}
+    Let whole number $n$ have prime decomposition $\prod_k p_k^{e_k}$.
+    Then the möbius function of $n$ is given as
+    \begin{equation}
+        \mu(n)=
+        \begin{cases}
+            (-1)^k, & \forall k, e_k=1 \\
+            0, & \exists k, e_k>1
+        \end{cases}
+    \end{equation}
+\end{definition}
+
+\begin{lemma}{Möbius inversion formula}
+    For a function $f$ consider the following definitions for all integers $n>0$.
+    \begin{equation}
+        F_+(n)\coloneqq\sum_{d|n} f(d),\ F_\times(n)\coloneqq\prod_{d|n} f(d)
+    \end{equation}
+    Then the Möbius inversion formula (which we will not prove) is
+    \begin{equation}
+        f(n) = \sum_{d|n} \mu(d)\cdot F_+\left(\frac{n}{d}\right)
+        = \prod_{d|n} F_\times\left(\frac{n}{d}\right)^{\mu(d)}
+    \end{equation}
+    Note that for every $d|n$ with quotient $q$, we also have $q|n$ with quotient $d$.
+    The formulas may thus be rewritten as
+    \begin{equation}
+        f(n) = \sum_{d|n} \mu\left(\frac{n}{d}\right)\cdot F_+(d)
+        = \prod_{d|n} F_\times(d)^{\mu(n/d)}
+    \end{equation}
+\end{lemma}
+
+\begin{lemma}[Phi_n by Möbius inversion]{$\Phi_n$ by Möbius inversion}
+    \begin{equation}
+        \Phi_n(X)
+        = \prod_{d|n} \left(
+            X^{n/d}-1
+        \right)^{\mu(d)}
+        = \prod_{d|n} \left(
+            X^d-1
+        \right)^{\mu(n/d)} \\
+    \end{equation}
+
+    \proof
+    Recall from \link[Cyclotomic extensions]{&cyclotomic extensions} that $\Phi_n$ may be expressed as
+    \begin{equation}
+        X^n-1 = \prod_{d|n} \Phi_d(X)
+    \end{equation}
+    The results follow by applying the Möbius inversion formula with $f(d)$ corresponding to $\Phi_d$ and $F_\times(n)$ corresponding to $X^n-1$.
+\end{lemma}
+
+\begin{theorem}[Phi_n(X) = Phi_m(X^{n/m})]{$\Phi_n(X)=\Phi_m(X^{n/m})$}
+    Suppose $n$ and $m$ have prime decompositions $\prod_k p_k^{e_k}$ and $\prod_k p_k^{f_k}$ respectively, with $e_k\geq f_k\geq 1$ for all $k$.
+    Then $\Phi_n(X)=\Phi_m(X^{n/m})$.
+
+    \proof
+    If $d|n$ but $d\nmid m$ then with prime decomposition $d=\prod_k p_k^{g_k}$ there exists some $k$ such that $g_k>f_k\geq 1$, in which case $\mu(d)=0$.
+    Using Möbius inversion for the first and last equations, we write
+    \begin{align}
+        \Phi_n(X) &= \prod_{d|n} (X^{n/d}-1)^{\mu(d)} \\
+        &= \prod_{d|n,\ d|m} ((X^{n/m})^{m/d}-1)^{\mu(d)} \prod_{d|n,\ d\nmid m} (X^{n/d}-1)^0 \\
+        &= \Phi_m(X^{n/m})
+    \end{align}
+\end{theorem}
+
+\begin{corollary}[Reducibility of Phi_n over F_q w.r.t. m]{Reducibility of $\Phi_n$ over $\F_q$ with respect to $m$}
+    Suppose $n$ and $m$ have prime decompositions $\prod_k p_k^{e_k}$ and $\prod_k p_k^{f_k}$ respectively, with $e_k\geq f_k\geq 1$ for all $k$.
+    With $q$ some prime power, suppose $q\equiv1(\bmod m)$.
+
+    Then $\Phi_n$ over $\F_q$ splits into $\phi(m)$ monic factors each of degree $n/m$ in the following form:
+    \begin{equation}
+        \Phi_n(X) = \prod_{k=1}^{\phi(m)} \left(X^{n/m}-\zeta_k\right)
+    \end{equation}
+    where the $\zeta_k$ are the $\phi(m)$ primitive $m$'th roots of unity in the group $\F_q^\times$.
+    Moreover, these factors are irreducible if and only if $\ord_n(q) = n/m$, in which case $\phi(m)=\phi(n)/\ord_n(q)$.
+
+    \proof
+    Consider the finite field $\F_q$, with cyclic multiplicative group of order $q-1$.
+    Since $m$ divides $q-1$ by assumption, the multiplicative group must have a cyclic subgroup of order $m$, containing the primitive $m$'th roots of unity $\{\zeta_k\}_{k\in[\phi(m)]}$, meaning $\zeta_k^i=1$ if and only if $i\equiv0(\bmod m)$.
+    We may then use the definition of the $m$'th cyclotomic polynomial over $\F_q$ to write
+    \begin{equation}
+        \Phi_m(X) = \prod_{k=1}^{\phi(m)} \left(X-\zeta_k\right)
+    \end{equation}
+    Noting our assumptions meet the criteria, we may apply the transformation \link[$\Phi_n(X)=\Phi_m(X^{n/m})$]{#Phi_n(X) = Phi_m(X^{n/m})} to get
+    \begin{equation}
+        \Phi_n(X) = \prod_{k=1}^{\phi(m)} \left(X^{n/m}-\zeta_k\right)
+    \end{equation}
+
+    Now the \link[Reducibility of $\Phi_n$ over $\F_q$]{&cyclotomic extensions/#Reducibility of Phi_n over F_q} asserts that $\Phi_n$ splits into $\phi(n)/\ord_n(q)$ monic, irreducible factors each of degree $\ord_n(q)$.
+    In the equation above, $\Phi_n$ has split into $\phi(m)$ factors each of degree $n/m$.
+    Then these factors are irreducible precisely when $\ord_n(q)=n/m$.
+\end{corollary}
+
+
+\section{Chinese Remainder Theorem}
+
+The Chinese Remainder Theorem (CRT) was originally used in the context of modular arithmetic.
+Here we first describe a more general version of the Chinese Remainder Theorem in the context of arbitrary commutative rings, but restricted to the case of two ideals.
+Then we generalize from the case of two ideals to the case of any finite number of ideals.
+Keep in mind we are presenting the Chinese Remainder Theorem as something of independent interest from the representation of cyclotomic polynomials in the first section.
+
+\begin{lemma}{Binary Chinese Remainder Theorem}
+    For commutative ring $R$, let $I,J\subseteq R$ be coprime ideals, meaning $I+J = R$.
+    Then we have
+    \begin{equation}
+        R/(IJ)\cong R/I\times R/J
+    \end{equation}
+    with corresponding isomorphism $x+IJ\to(x+I,x+J)$.
+    
+    \proof
+    Consider the natural homomorphism $\psi\colon R\to R/I\times R/J$ with $\psi(x)=(x+I,x+J)$.
+    We will show that $\psi$ has kernel $\text{ker}(\psi)=IJ$ and image $\text{img}(\psi)=R/I\times R/J$.
+    Hence upon invoking what's called the `First Isomorphism Theorem' for rings, we conclude
+    \begin{equation}
+        R/\text{ker}(\psi)\cong\text{img}(\psi)
+        \implies
+        R/(IJ)\cong R/I\times R/J
+    \end{equation}
+
+    Since $I+J=R$, there must be $i\in I$ and $j\in J$ such that $i+j=1$.
+    We will exploit $i$ and $j$ below without reintroduction.
+
+    \bold{Kernel:}
+    The kernel is all $x\in R$ such that $x+I=I$ and $x+J=J$, that is the set $I\cap J$.
+    For $x\in I\cap J$, we have $x(i+j)=xi+xj\in IJ$ as $ix,xj\in IJ$, and thus $I\cap J\subseteq IJ$.
+    To show $IJ\in I\cap J$ we don't need the fact the $I$ and $J$ are coprime.
+    For $x=i_1j_1+\dots+i_nj_n\in IJ$ with $i_k\in I$ and $j_k\in J$ we observe that each $i_kj_k\in IJ$ and since $IJ$ is itself an ideal, as an additive subgroup it is closed under addition, that way $x\in IJ$.
+    We conclude $\text{ker}(\psi)=I\cap J=IJ$.
+
+    \bold{Image:}
+    To prove $\text{img}(\psi)=R/I\times R/J$ we must find a pre-image for any $(\alpha+I,\beta+J)$.
+    The pre-image $\alpha i+\beta j$ satisfies as
+    \begin{align}
+        \psi(\alpha i+\beta j) \\
+        &= (\alpha i+\beta j+I,\alpha i+\beta j+J) \\
+        &= (\beta j+I,\alpha i+J) \\
+        &= (\beta j+\beta i+I,\alpha i+\alpha j+J) \\
+        &= (\beta+I,\alpha+J)
+    \end{align}
+
+    Last we must show that the homomorphism $f\colon R/IJ\to R/I\times R/J$ sending $x+IJ$ to $\psi(x)=(x+I,x+J)$ is an isomorphism.
+    Let $\pi\colon R\to R/IJ$ be the projection homomorphism $x\to x+IJ$.
+    Then $f\circ\pi=\psi$, and since $\psi$ is surjective it must be that $f$ (and $\pi$) is surjective.
+    The kernel of $f$ is all $x+IJ$ such that $x\in I$ and $x\in J$, that is $I\cap J$ which we know (from examining the kernel of $\psi$) is equal to $IJ$.
+    Since $f$ is injective and surjective it is an isomorphism.
+\end{lemma}
+
+\begin{note}
+    As is shown in the proof of the previous lemma, when two ideals $I$ and $J$ are coprime we have the equality $IJ=I\cap J$.
+    The isomorphism for the binary case of the Chinese Remainder Theorem can then be written as
+    \begin{equation}
+        R/(I\cap J)\cong R/I\times R/J
+    \end{equation}
+    Similarly, for the general case shown in the following lemma we may write
+    \begin{equation}
+        R/(I_1\cap\dots\cap I_n)\cong R/I_1\times\dots\times R/I_n
+    \end{equation}
+\end{note}
+
+\begin{theorem}[Chinese Remainder Theorem theorem]{Chinese Remainder Theorem}
+    For commutative ring $R$, let $I_1,\dots,I_n\subseteq R$ be mutually coprime ideals, meaning $I_j+I_k = R$ for all $1\leq j<k\leq n$.
+    Then we have
+    \begin{equation}
+        R/(I_1\dots I_n)\cong R/I_1\times\dots\times R/I_n
+    \end{equation}
+    with corresponding isomorphism $x+(I_1\dots I_n)\to(x+I_1,\dots,x+I_n)$.
+
+    \proof
+    Two ideals are coprime if and only if their sum contains the multiplicative identity.
+    Then by assumption $1\in I_j + I_n$ for all $j\in[n-1]$, and in particular there exist $\alpha_j\in I_j,\ \beta_j\in I_n$ for all $j\in[n-1]$ such that $\alpha_j+\beta_j=1$.
+    Their product expands as
+    \begin{equation}
+        1 = \prod_{j=1}^{n-1} \left(\alpha_j+\beta_j\right)
+        = \left(\prod_{j=1}^{n-1} \alpha_j\right) + \gamma
+        \in\left(\prod_{j=1}^{n-1} I_j\right) + I_n
+    \end{equation}
+    where $\gamma\in I_n$ because every term of $\gamma$ contains some $\beta_j\in I_n$.
+    Thus $(I_1\dots I_{n-1})$ and $I_n$ and coprime.
+
+    Then the \link[binary case of the Chinese Remainder Theorem]{#Binary Chinese Remainder Theorem} followed by induction implies
+    \begin{align}
+        R/(I_1\dots I_n) &= R/((I_1\dots I_{n-1})I_n) \\
+        &\cong R/(I_1\dots I_{n-1})\times R/I_n \\
+        &\cong (R/I_1\times\dots\times R/I_{n-1})\times R/I_n \\
+        &\cong R/I_1\times\dots\times R/I_n
+    \end{align}
+    
+    We may also apply the binary case of the Chinese Remainder Theorem to conclude the following homomorphism is an isomorphism
+    \begin{equation}
+         x+(I_1\dots I_{n-1})I_n
+         \to(x+(I_1\dots I_{n-1}),x+I_n)
+    \end{equation}
+    By induction $x+(I_1\dots I_{n-1})\to(x+I_1,\dots,x+I_{n-1})$ is an isomorphism, so composing with the previous isomorphism yields the desired isomorphism
+    \begin{equation}
+         x+(I_1\dots I_{n-1}I_n)
+         \to(x+I_1,\dots,x+I_{n-1},x+I_n)
+    \end{equation}
+\end{theorem}
+
+
+\section[An example representing F_q[X]/Phi_n(X)]{An example representing $\F_q[X]/\Phi_n(X)$}
+
+The tools developed in the other two sections are used \link[elsewhere]{&ring of interest} in this project, and as far as we have developed them so far they have no overlapping use.
+But before concluding this page we can illustrate how we may combine them in a straightforward and useful way.
+In particular, below we show how cyclotomic polynomials can be represented over finite fields using both the reducibility result shown in the first section, as well as the generalized Chinese Remainder Theorem.
+
+\begin{lemma}[Representation of F_q[X]/Phi_n(X)]{Representation of $\F_q[X]/\Phi_n(X)$}
+    Let $\F_q$ be a finite field of prime power order $q$, and suppose we have $m$ and $n$ as in \link[reducibility of $\Phi_n$ over $\F_q$ with respect to $m$]{#Reducibility of Phi_n over F_q w.r.t. m} for the special case that $\ord_n(q)=n/m$.
+    Then we have
+    \begin{equation}
+        \F_q[X]/\Phi_n(X)
+        = \F_q[X]\bigg/\prod_{k=1}^{\phi(m)} \left(X^{n/m}-\zeta_k\right)
+        \cong\prod_{k=1}^{\phi(m)} \frac{\F_q[X]}{X^{n/m}-\zeta_k}
+    \end{equation}
+    with $\zeta_k$ the $\phi(m)$ primitive $m$'th roots of unity in the group $\F_q^\times$.
+
+    \proof
+    The first equality holds by the \link[reducibility of $\Phi_n$ over $\F_q$ with respect to $m$]{#Reducibility of Phi_n over F_q w.r.t. m}.
+    The isomorphism holds by the \link[Chinese Remainder Theorem]{#Chinese Remainder Theorem theorem} provided the $\phi(m)$ factors of $\Phi_n$ generate mutually coprime ideals.
+    We now show this is indeed the case.
+
+    Each factor $X^{n/m}-\zeta_k$ is irreducible since we assume $\ord_n(q)=n/m$, and therefore each ring $\F_q/(X^{n/m}-\zeta_k)$ in the direct product is a (finite) field.
+    From commutative ring theory we know an ideal $I$ is maximal if and only if the quotient ring $R/I$ is a field.
+    Therefore, the ideals generated by the factors $X^{n/m}-\zeta_k$ are maximal.
+    If $I$ and $J$ are distinct, maximal ideals, then $I+J$ is an ideal larger than both $I$ and $J$ and hence must be $R$ (that is $I$ and $J$ are coprime).
+    As maximal ideals $(X^{n/m}-\zeta_k)$ and $(X^{n/m}-\zeta_{k'})$ are distinct for all $k\neq k'$, we have it that the factors of $\Phi_n$ generate mutually coprime ideals.
+\end{lemma}
