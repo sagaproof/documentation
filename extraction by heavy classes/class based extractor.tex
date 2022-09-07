@@ -1,0 +1,232 @@
+
+\section{Linear relation proof of knowledge}
+
+Let $\R$ be a commutative ring, $\S$ an $\R$-module, and $A\in\S^m$.
+Consider the following sigma protocol between a prover and verifier.
+\begin{enumerate}
+    \item
+    The prover sends $T\in\S^{\ell_1}$ to the verifier.
+
+    \item
+    The verifier samples a challenge $C\in\R^{\ell_1\times\ell_2}\leftarrow\C$ and sends it to the prover.
+
+    \item
+    The prover replies with $W\in\R^{m\times\ell_2}$, which the verifier then checks satisfies the equation $A^\intercal W=T^\intercal C$.
+    The verifier additionally checks $W$ with respect to a function $\Check\colon\R^{m\times\ell_2}\to\{0,1\}$ ensuring $\Check(W)=1$.
+\end{enumerate}
+
+We will show the protocol satisfies the following notions of completeness and knowledge soundness.
+
+\bold{Completeness:}
+
+Suppose the prover holds $V\in\R^{m\times\ell_1}$ such that for all possible challenges $C\in\C\subseteq\R^{\ell_1\times\ell_2}$ it holds that $\Check(VC)=1$.
+Furthermore, suppose the prover in the first round sends $T\coloneq A^\intercal V$, and in the third round for verifier's challenge $C\in\C$ sends $W\coloneq VC$.
+Then the prover always passes.
+
+\bold{Knowledge soundness:}
+
+% $LRE(\iota,\C,\Check,\Clash)$
+
+Suppose for $\iota\in[\ell_1]$ that the $\iota$'th row of the distribution $\C\subseteq\R^{\ell_1\times\ell_2}$ is the transpose of a distribution $\C_\iota\subseteq\R^{\ell_2}$.
+Furthermore, suppose for symmetric relation $\Clash\colon\C_\iota\times\C_\iota\to\{0,1\}$ and any $c\in\C_\iota$, the probability $c'\leftarrow\C_\iota$ clashes with $c$ is at most $\rho$, that is
+\begin{equation}
+    \Pr[\Clash(c,c')=1|c\in\C_\iota, c'\leftarrow\C_\iota] \leq \rho
+\end{equation}
+Then if the prover passes with probability $\epsilon\geq\rho/\sigma$ for constant $\sigma\in[\rho,1)$ we may construct an extractor that, given oracle access to the prover, runs in expected time $\bigO(1)/\epsilon$ and outputs $W,W'\in\R^{m\times\ell_2}$ and $c,c'\in\C_\iota\subseteq\R^{\ell_2}$ such that the following hold.
+\begin{gathered}
+    \Check(W) = \Check(W') = 1, \Clash(c,c') = 0 \\
+    A^\intercal(W-W') = T_\iota(c-c')^\intercal
+\end{gathered}
+
+
+\subsection{Proving completeness}
+
+To always pass means that regardless the verifier's challenge $C$, both the verifier's checks pass.
+With the prover behaving as described we have $\Check(W)=\Check(VC)=1$, and also $A^\intercal W=A^\intercal (VC)=(A^\intercal V)C=T^\intercal C$.
+
+
+\subsection{Proving knowledge soundness}
+
+Denote the probabilistic prover as a function $\mathcal{P}\colon\C\times\Omega\to\R^{m\times\ell_2}$ where $\Omega$ is the distribution of randomness fed to the prover.
+We will invoke the \link[heavy class extractor]{} $HCE(\Sample,\Valid,\Clash)$ parameterized as follows.
+\begin{itemize}
+    \item
+    The heavy class extractor operates with respect to a set on which we define a probability distribution as well as an equivalence relation $\sim$.
+    Let the set be $(\C,\Omega)$, and for $(C,\omega),(C',\omega')\in(\C,\Omega)$ let $(C,\omega)\sim(C',\omega')$ if $C_i = C'_i$ for all $\ell_1-1$ rows $i\neq\iota$.
+
+    \item
+    Let sampler $\Sample\colon(\C,\Omega)?\to(\C,\Omega)$ accepting optional argument operate as follows.
+    \begin{itemize}
+        \item
+        If no argument is present, sample from $(\C,\Omega)$ and return the result.
+        \item
+        If an argument $(C,\omega)$ is present, sample from the same equivalence class and return the result.
+        To do so, first sample randomness $\omega'\leftarrow\Omega$, and sample an $\iota$'th challenge row $c\leftarrow\C_\iota$.
+        Then return $(C',\omega')$, where $C'_i=C_i$ for all $\ell_1-1$ rows $i\neq\iota$, and $C'_\iota=c^\intercal$. 
+    \end{itemize}
+
+    \item
+    The event of validity $\Valid\colon(\C,\Omega)\to\{0,1\}$ is the event that the prover succeeds on the argument.
+    In particular, for $(C,\omega)\in(\C,\Omega)$ we invoke the prover on challenge $C$ and randomness $\omega$ to obtain $W = \mathcal{P}(C,\omega)$.
+    If $\Check(W)=1$ and $A^\intercal W = T^\intercal C$ return $1$ and otherwise return $0$.
+
+    While randomness $\omega$ is fed to the prover along with the challenge, only the challenge is visible to the extractor.
+    Moreover, the extractor cannot bias the randomness.
+    Even requesting to use the same randomness as in the previous invocation is forbidden.
+
+    \item
+    We will extend the provided clashing relation $\Clash$ to obtain another clashing relation $\ClashExt$ for the heavy class extractor.
+    Specifically, let $\ClashExt\colon(\C,\Omega)\times(\C,\Omega)\to\{0,1\}$ be an extension of $\Clash\colon\C_\iota\times\C_\iota\to\{0,1\}$ defined as
+    \begin{align}
+        \ClashExt((C,\omega),(C',\omega')) \coloneq \Clash(C_\iota,C'_\iota)
+    \end{align}
+    where $C_\iota$ and $C'_\iota$ are the $\iota$'th rows of $C$ and $C'$.
+\end{itemize}
+
+We now prove the assumptions necessary for the heavy class extractor by using our assumptions for this protocol.
+The first assumption we must prove is with respect to validity, that is a lower bound on the probability $\Valid((C,\omega))=1$ for $(C,\omega)\leftarrow(\C,\Omega)$.
+The function $\Valid$ invokes the prover on challenge $C$ and randomness $\omega$, checks the prover's response, and outputs $1$ if the prover passes and $0$ otherwise.
+The probability $\Valid$ outputs $1$ is precisely the probability the prover passes, and since we assume the prover passes with probability $\epsilon\geq\rho/\sigma$ we conclude
+\begin{equation}
+    \Pr[\Valid((C,\omega))=1|(C,\omega)\leftarrow(\C,\Omega)]
+        = \epsilon \geq \rho/\sigma
+\end{equation}
+
+The second assumption we must prove is with respect to clashing, that is an upper bound on the probability $\ClashExt((C,\omega),(C',\omega'))=1$ for any $(C,\omega)\in(\C,\Omega)$ and $(C',\omega')\leftarrow(\C,\Omega)$.
+By the definition of $\ClashExt$ this occurs only when $\Clash(C_\iota,C'_\iota)=1$ so we conclude
+\begin{gathered}
+    \Pr[
+        \ClashExt((C,\omega),(C',\omega'))
+        | (C,\omega)\in(\C,\Omega), (C',\omega')\leftarrow(\C,\Omega)
+    ]
+    = \Pr[
+        \Clash(C_\iota,C'_\iota)
+        | C\in\C, C'\leftarrow\C, \omega\in\Omega, \omega'\leftarrow\Omega
+    ]
+    = \Pr[
+        \Clash(C_\iota,C'_\iota)
+        | C\in\C, C'\leftarrow\C
+    ]
+    = \Pr[
+        \Clash(C_\iota,C'_\iota)
+        | C_\iota\in\C_\iota, C'_\iota\leftarrow\C_\iota
+    ]
+    \leq \rho
+\end{gathered}
+
+We now construct our promised output using the promised output of the heavy class extractor.
+The heavy class extractor returns $(C,\omega)$ and $(C',\omega')$ in the same equivalence class of $(\C,\Omega)/\sim$ such that both are valid with respect to $\Valid$ and they do not clash with respect to $\ClashExt$, that is
+\begin{gathered}
+    \Valid((C,\omega)) = \Valid((C',\omega')) = 1 \\
+    \ClashExt((C,\omega),(C',\omega')) = 0
+\end{gathered}
+By the definition of $\Valid$ we conclude that $W=\mathcal{P}(C,\omega)$ and $W'=\mathcal{P}(C',\omega')$ satisfy
+\begin{align}
+    \Check(W) = \Check(W') = 1 \\
+    A^\intercal W = T^\intercal C, A^\intercal W' = T^\intercal C'
+\end{align}
+By the definition of $\ClashExt$ we conclude
+\begin{equation}
+    \Clash(C_\iota,C'_\iota) = \ClashExt((C,\omega),(C',\omega')) = 0
+\end{equation}
+Since $C$ and $C'$ are in the same equivalence class, for the $\ell_1-1$ rows $i\neq\iota$ we have $C_i=C'_i$, implying
+\begin{equation}
+    A^\intercal(W-W') = T^\intercal(C-C')
+    = \sum_{i\in[\ell_1]} T_i(C_i-C'_i)^\intercal
+    = T_\iota(C_\iota-C'_\iota)^\intercal
+\end{equation}
+The output of our extractor is $W,W'\in\R^{m\times\ell_2}$ and $C_\iota,C'_\iota\in\C_\iota$.
+
+Lastly, since the heavy class extractor operates in expected time $\bigO(1)/\epsilon$, so does our extractor.
+
+
+
+
+
+
+
+
+
+
+in both examples below we'll have H sample each element in R^l2 iid, and in Clash we'll have the conjunction of the same predicate for all elements.
+we leave the rows alone to emphasize our method of extraction doesn't depend on independent entries in each row, not just for sampling the rows but for defining their clashing
+
+
+
+\section{Discrete Log Example}
+
+Let the ring $\R$ be a finite field $\F_q$ of prime order $q$, and let the $\R$-module $\S$ be a group $\G$ of order $q$.
+Let $A\in\G^m$ be a vector of group elements.
+A prover and verifier may engage in the following sigma protocol.
+\begin{enumerate}
+    \item
+    The prover sends $T\in\G^\ell$ to the verifier.
+
+    \item
+    The verifier samples a challenge $C\in\F_q^\ell$ uniformly and sends it to the prover.
+
+    \item
+    The prover replies with $W\in\F_q^m$, which the verifier then checks satisfies the equation $A^\intercal W=T^\intercal C$.
+\end{enumerate}
+
+The protocol satisfies the following notions of completeness and knowledge soundness.
+
+\bold{Completeness:}
+
+Suppose the prover holds $V\in\F_q^{m\times\ell}$.
+Furthermore, suppose the prover in the first round sends $T\coloneq A^\intercal V$, and in the third round for verifier's challenge $C\in\F_q^\ell$ sends $W\coloneq VC$.
+Then the prover always passes.
+
+\bold{Knowledge soundness:}
+
+If the prover passes with probability $\epsilon\geq1/(\sigma q)$ for constant $\sigma\in[1/q,1)$ we may construct an extractor that, given oracle access to the prover, runs in expected time $\bigO(1)/\epsilon$ and outputs $V\in\F_q^{m\times\ell}$ such that $A^\intercal V = T^\intercal$.
+
+
+
+Proof
+Completeness:
+Completeness follows from the completeness of the \link[linear relation proof of knowledge]{}.
+
+
+Knowledge soundness:
+
+For each $\iota\in[\ell]$ we will apply the knowledge soundness result from \link[linear relation proof of knowledge]{} to extract the $\iota$'th column of promised output $V\in\F_q^{m\times\ell}$.
+We apply the knowledge soundness result using the following parameters.
+\begin{itemize}
+    \item
+    $\ell_1\coloneq\ell$ and $\ell_2\coloneq1$
+
+    \item
+    $\C_\iota\coloneq\F_q$ is the uniform distribution on $\F_q$.
+
+    \item
+    $\Check(W\in\F_q^m)\coloneq1$ is trivially accepting.
+
+    \item
+    $\Clash(x,y)\coloneq x=y?1:0$ is the trivial equality relation.
+    Then for any $x\in\F_q$ the probability $y\leftarrow\F_q$ clashes with $x$ is $1/q$.
+\end{itemize}
+Thus in expected time $\bigO(1)/\epsilon$ the extractor outputs $W,W'\in\F_q^m$ and $c\neq c'\in\F_q$ such that $A^\intercal(W-W') = T_\iota(c-c')$.
+Setting the $\iota$'th column of $V$ to $(W-W')/(c-c')$ we have $A^\intercal V = T^\intercal$.
+
+
+
+\section{Short Integer Solution Example}
+
+Let $\R=\Z_q$ for integer $q>0$ and let $\S=\Z_q^n$ and $A\in\Z_q^{m\times n}$.
+we invoke the linear relation proof of knowledge for all iota in ell_1
+C_iota is uniform on {0,1}
+Check(W) is |W| <=? beta
+Clash(c,c') is c!=?c'
+Output we get W,W' and c,c' st. A(W-W') = T_iota(c-c')
+If T_iota is zero everywhere then A(W-W') = T_iota = 0
+otherwise pick index where c!=c' to get d, then A(W-W')/d = T_iota
+
+
+
+
+
+
+
+
+
