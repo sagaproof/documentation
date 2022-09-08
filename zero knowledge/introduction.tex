@@ -1,0 +1,39 @@
+
+\begin{note}
+    A mashup of previous notes on zero-knowledge, yet to be edited and organized.
+\end{note}
+
+The word `proof' is usually taken to be a noun.
+In \link[Merriam-Webster Dictionary]{merriam-webster.com/dictionary/proof}, the first meaning of `proof' listed (and conveying the earliest historical meaning) reads as follows.
+\begin{quote}
+    the cogency of evidence that compels acceptance by the mind of a truth or a fact
+\end{quote}
+A proof is evidence that compels one to accept whatever is to be proven.
+The definition does not restrict the possible forms of the evidence. 
+Evidence can take either a dynamic or a static form.
+In dynamic form, a conversation in which one person convinces another could serve as evidence.
+In static form, a certificate from a trusted party could serve as evidence.
+In the case of dynamic evidence, the proof is the dynamic process conveying the evidence.
+In the case of static evidence, the proof is the static object containing the evidence.
+When the evidence is communicated dynamically, we say the proof is \emph{interactive}.
+When the evidence is communicated statically, we say the proof is \emph{non-interactive}.
+A proof system is interactive or non-interactive depending on whether it features interactive or non-interactive proofs.
+
+The standard practice of implementation within the crypto community treats proofs as static blobs of data that computers read and write.
+A proving computer writes a non-interactive proof and sends it to a verifying computer that reads it.
+In theory, however, proofs are more often designed and analyzed as dynamic processes of communication between computers.
+A proving computer and verifying computer interact by sequentially sending messages between each other.
+Regardless whether a proof system is interactive or non-interactive, there always exists a proving party, referred to as the \emph{prover}, and a verifying party, referred to as the \emph{verifier}.
+The purpose of any proof system is for the prover to convince the verifier that a given statement is true.
+The prover claims the statement is true, but the verifier may be doubtful, so the prover must prove the statement.
+
+There exists a plethora of features a proving system can satisfy, such as all kinds of practicality measures which are of tremendous importance for our purposes.
+Another umbrella of features exist in regard to privacy, in particular regarding what exactly the prover must share with the verifier in order to prove the statement.
+By proving the statement, the prover inevitably reveals to the verifier that the statement is true. 
+If the verifier trusts the prover, all that the prover needs to share is this single bit of information that the statement is true.
+In the default case that the verifier does not trust the prover, however, more information must be shared in order for the proof to be convincing.
+Privacy for the prover may be preserved if the information shared reveals nothing the prover is afraid to share. 
+To be more strict, one may also require that the information shared be useless to the verifier for anything beyond verifying the proof.
+In terms of computation, information is useful when it can be used to compute something useful.
+Thus in our setting where proofs are exchanged between computers, we may require that the verifier cannot use the information to compute anything useful beyond verification.
+The latter requirement is informally what stands behind the formal definition of `zero-knowledge.' 

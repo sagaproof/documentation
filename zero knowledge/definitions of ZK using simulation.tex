@@ -1,0 +1,258 @@
+\begin{define}
+    \newcommand\ppt{\text{probabilistic polynomial-time}}    
+\end{define}
+
+Here we reduce definitions of zero-knowledge to definitions of ensemble indistinguishability.
+There are three such definitions, namely perfect, statistical, and computational indistinguishability.
+To see the relevant definitions of ensemble indistinguishability consult \link[indistinguishability]{&indistinguishability}.
+The three types of indistinguishability gives rise to three corresponding types of zero-knowledge, namely perfect, statistical, and computational zero-knowledge respectively.
+When zero-knowledge is reference without a type it usually refers to computational zero-knowledge but it is the most encompassing definition of zero-knowledge.
+
+The idea behind the definition of zero-knowledge is if one can simulate the interaction without any help from the prover then one certainly does not gain knowledge by interacting with the prover.
+We first present definitions of zero-knowledge based on the simulation of the output of the verifier.
+Second we present definitions based on the simulation of the messages received by the verifier.
+Then we present relaxed alternatives that may apply to either kind of definition, and lastly we mention the complexity classes inspired by zero-knowledge definitions.
+
+Often one may better understand a definition by examining how many alternating quantifiers are involved in the definition and what purposes they each serve.
+In the case of zero-knowledge definitions, there are usually three quantifiers.
+The first is universal and quantifies over verifiers.
+The second is existential and quantifies over simulators.
+The third is universal and quantifies over instances of the language, that is the language in which the prover wishes to prove membership.
+In the special case of honest-verifier zero-knowledge defined below, the first quantifier is dropped, and indeed this yields a weaker definition.
+
+
+\section{Simplified and auxiliary-input ZK}
+
+Recall from \link{../interactive_proofs/remarks} that $\langle A, B \rangle(x)$ denotes the output of machine $B$ after interacting with machine $A$ on common input $x$. 
+
+\begin{definition}[Simplified zero-knowledge]
+    An interactive proof system $(P,V)$ for a language $L$ is \emph{zero-knowledge without auxiliary input} if for every $\ppt$ verifier $V^*$ there exists a $\ppt$ simulator $M^*$ such that the following two ensembles are indistinguishable.
+    \begin{equation}
+        \{ \langle P, V^* \rangle(x) \}_{x\in L}
+        \text{ and }
+        \{ M^*(x) \}_{x\in L}
+    \end{equation}
+\end{definition}
+
+The above definition was the original definition of zero-knowledge, that is the one proposed in \cite{GMR85}.
+Subsequently, \cite{GO90} proposed an augmented definition called `auxiliary-input zero-knowledge', allowing the verifier to have any auxiliary input before beginning interaction with the prover.
+The auxiliary input is intended to account for information the verifier may have already received from the prover in prior interactions should the protocol be executed as a subprotocol inside a larger protocol.
+For example, many proof systems such as the cut-and-choose type have a high soundness error and therefore in order to attain negligible soundness error the protocol must be executed many times.
+Indeed, \cite{GO90} show that auxiliary-input zero-knowledge proof systems are closed under sequential composition, meaning the sequential execution of auxiliary-input zero-knowledge protocols is itself an auxiliary-input zero-knowledge protocol.
+
+\begin{definition}[Auxiliary-input zero-knowledge]
+    An interactive proof system $(P,V)$ for a language $L$ is auxiliary-input zero-knowledge if for every $\ppt$ verifier $V^*$ there exists a $\ppt$ simulator $M^*$ such that the following two ensembles are indistinguishable.
+    \begin{equation}
+        \{ \langle P, V^*(y) \rangle(x) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+        \text{ and }
+        \{ M^*(x,y) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+    \end{equation}
+    The $y$ values are the auxiliary inputs.
+    The running times of $V^*$ and $M^*$ are measured in terms of their input lengths, both of which are $|x|+|y|$.
+\end{definition}
+
+\begin{remark}[Irony of theory vs practice]
+    Note that in auxiliary-input zero-knowledge the verifier but not the prover has access to an auxiliary input.
+    Somewhat ironically, the opposite occurs in the definition of zero-knowledge we use in practice (defined in \link[?]{}).
+    Specifically, the prover but not the verifier has access to an auxiliary input.
+    This is an example where theoretical and practical motivations (such as those of \cite{GO90} and ours respectively) lead in different directions.
+
+    In theory, the prover has unbounded computational resources and therefore does not need an auxiliary input.
+    In practice, the prover runs in polynomial time and may need the witness as an auxiliary input.
+    In theory, $P$ may leak information about the witness in such a way that $V$ may aggregate the information across multiple executions of the protocol and then convert the information into knowledge.
+    The verifier is given auxiliary input to represent this information, and the definition of auxiliary-input zero-knowledge ensures that even with this information zero-knowledge still holds.
+    In practice, $P$ does not leak any information about the witness and the verifier has no secret information to hide from the prover, so any verifier auxiliary input may be considered part of the common input.
+\end{remark}
+
+Most known zero-knowledge proof systems are naturally auxiliary-input zero-knowledge.
+But \cite{GK96} constructed a proof system satisfying simplified zero-knowledge but not auxiliary-input zero-knowledge.
+Since most proof systems already satisfy auxiliary-input zero-knowledge and it is necessary for sequential composition, auxiliary-input zero-knowledge is a natural default definition for zero-knowledge.
+
+
+\section{View-based and honest verifier ZK}
+
+We now proceed to discuss several more variations of zero-knowledge.
+Each of them may be either simplified zero-knowledge or auxiliary-input zero-knowledge.
+For completeness, we state the definitions as auxiliary-input zero-knowledge, but the auxiliary inputs could just as well be omitted to obtain simplified versions.
+Like before, we assume the running times of the verifier and simulator are measured in the total lengths of their inputs.
+
+First we present a definition of zero-knowledge from \cite{GO90} based on what the verifier receives from the prover, rather than what the verifier outputs after interacting with the prover.
+We may refer to this as `view-based' zero-knowledge, whereas we may refer to the previous definitions as `output-based' zero-knowledge.
+
+\begin{definition}[View-based zero-knowledge]
+    For an interactive proof system $(P,V)$, denote by $\text{view}(P, V^*(y), x)$ the \emph{view} of the interaction as seen by $V^*$, consisting of the common input $x$, auxiliary input $y$, the random coins of $V^*$, and all messages sent from $P$ to $V^*$ throughout the interaction.
+
+    We say $(P,V)$ for language $L$ is view-based zero-knowledge if for every $\ppt$ verifier $V^*$ there exists a $\ppt$ simulator $M^*$ such that the following two ensembles are indistinguishable.
+    \begin{equation}
+         \{ \text{view}(P, V^*(y), x) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+        \text{ and }
+        \{ M^*(x,y) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+    \end{equation}
+\end{definition}
+
+Observe how the view-based definition is a simple modification of auxiliary-input zero-knowledge.
+We have simply replaced $\langle P, V^*(y) \rangle(x)$ with $\text{view}(P, V^*(y), x)$.
+We now show the previous view-based definition is equivalent to the output-based definition.
+
+\begin{theorem}[View-based ZK is equivalent to regular ZK]
+    A proof system is view-based zero-knowledge if and only if it is output-based zero-knowledge.  
+
+    \proof
+    To prove the forward direction, note that given the view of a verifier interacting with a prover one may compute the output of the verifier.
+    This is because the view not only includes the messages from the prover but also the inputs including the random input and any auxiliary input, such that the output is a polynomial-time deterministic function of the view.
+    Therefore if the view contains no knowledge then the output contains no knowledge, so view-based zero-knowledge implies output-based zero-knowledge.
+
+    Towards proving the backward direction, first note that even if a protocol is output-based zero-knowledge with respect to a certain verifier, we can't say it is view-based zero-knowledge with respect to that verifier because the view may contain knowledge while the output does not.
+    This trouble can only be circumvented because the definition of zero-knowledge universally quantifies over all verifiers.
+    In order to prove the view of a verifier $V^*$ contains no knowledge we prove the output of a related verifier ${V^*}'$ contains no knowledge.
+    The verifier ${V^*}'$ uses $V^*$ as a black-box and ${V^*}'$ basically delegates its own role as a verifier to $V^*$ by passing all inputs to $V^*$ and acting as an intermediary between $V^*$ and the prover.
+    While acting as an intermediary, ${V^*}'$ records all messages sent to $V^*$.
+    By the end, ${V^*}'$ has captured the entire view of $V^*$.
+    When $V^*$ sends its final output, ${V^*}'$ does not output the same, but rather discards the output of $V^*$ and instead outputs the view of $V^*$.
+    So basically this shows that the set of views of all verifier is a subset of the set of outputs of all verifiers.
+    Therefore if the set of outputs contain no knowledge then the set of views contain no knowledge, so output-based zero-knowledge implies view-based zero-knowledge.
+\end{theorem}
+
+Now we move to what's called `honest-verifier' zero-knowledge which is formulated in terms of view-based zero-knowledge.
+A common way to relax the requirements of zero-knowledge it to only require security against the single prescribed verifier strategy rather than against all possible verifier strategies.
+A verifier that uses the prescribed verifier strategy is called an `honest verifier.'
+An honest verifier will not ask maliciously intended questions to the prover, but may still examine the responses from the prover and try to extract knowledge from them.
+The output of the prescribed prover is only a single bit indicating acceptance or rejection.
+While the single output bit of the verifier may not contain knowledge, the view of the verifier may well contain knowledge.
+Therefore in order to prove zero-knowledge with respect to an honest-verifier, we must use view-based rather than output-based zero-knowledge.
+
+\begin{definition}[Honest verifier zero-knowledge]
+    A proof system $(P,V)$ for a language $L$ is \emph{honest verifier zero-knowledge} if there exists a $\ppt$ simulator $M$ such that the following two ensembles are indistinguishable.
+    \begin{equation}
+        \{ \text{view}(P, V(y), x) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+        \text{ and }
+        \{ M(x,y) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+    \end{equation}
+\end{definition}
+
+The work \cite{GSV98} proves that honest-verifier statistical zero-knowledge implies statistical zero-knowledge in general.
+For the special case of public-coin honest-verifier zero-knowledge, the transformation also applies to computational zero-knowledge rather than just statistical and perfect zero-knowledge.
+Notably, the transformation of \cite{GSV98} does not rely on intractability assumptions.
+
+While honest-verifier zero-knowledge is insufficient in general because there's no guarantee the verifier will use the prescribed strategy, it is often sufficient in practical proof systems.
+Most proof systems used in practice employ the Fiat-Shamir transformation to convert the proof to a non-interactive proof, effectively leaving the verifier strategy up the prover.
+The prover should naturally choose the prescribed verifier strategy if it wishes to prove the statement while maintaining privacy.
+The reason the notion of honest-verifier zero-knowledge is important to us is precisely this non-interactive scenario popular in practice.
+
+
+\section{Relaxations of zero-knowledge}
+
+First we present a relaxation called the `liberal' notion of zero-knowledge \cite{Gol01} page 205.
+This relaxation applies to all three forms of zero-knowledge, that is perfect, statistical, and computational zero-knowledge.
+
+\begin{definition}[Perfect zero-knowledge]
+    A proof system $(P,V)$ for some language $L$ is \emph{perfect zero-knowledge in the liberal sense} if for every $\ppt$ simulator $V^*$ there exists a probabilistic, expected polynomial-time simulator $M^*$ such that the following two distributions are identical.
+    \begin{equation}
+        \{ \langle P, V^*(y) \rangle(x) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+        \text{ and }
+        \{ M^*(x,y) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+    \end{equation}
+    The expectation of the simulator's running time is taken over its internal coin tosses.
+\end{definition}
+
+In the above definition lets the simulator run in expected polynomial-time but never fail to output an identical distribution.
+An alternative lets the simulator run in strict polynomial time but fail with negligible probability.
+
+\begin{definition}[Relaxed perfect zero-knowledge]
+    A proof system $(P,V)$ for some language $L$ is \emph{perfect zero-knowledge with bounded error} if for every $\ppt$ verifier $V^*$ there exists a $\ppt$ simulator $M^*$ such that the following two conditions hold.
+    \begin{itemize}
+        \item
+        With probability bounded away from one the simulator fails by outputting the symbol $\perp$.
+        For the constant bound $1/2$ this means for every $x\in L$ and $y\in\{0,1\}^{\poly{|x|}}$ we have
+        \begin{equation}
+            \Pr{M^*(x,y)=\perp} \leq \frac{1}{2}
+        \end{equation}
+        The probability is taken over $x$ and $y$ and the internal coin tosses of $M^*$.
+        One may invoke the simulator enough times to render a negligible probability of error.
+        Or one could strengthen the definition and require the initial probability of error to be negligible.
+
+        \item
+        Consider the distribution of random variable $M^*$ conditioned on it not outputting $\perp$.
+        Let $m^*$ be the random variable describing this conditional distribution.
+        The following two distributions must be identical.
+        \begin{equation}
+            \{ \langle P, V^*(y) \rangle(x) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+            \text{ and }
+            \{ m^*(x,y) \}_{x\in L, y\in\{0,1\}^{\poly{|x|}}}
+        \end{equation}
+    \end{itemize}
+\end{definition}
+
+\begin{remark}[The symbol $\perp$]
+    The symbol $\perp$ is an upside down `T', as if signifying something antithetical to `true.'
+    It denotes that something went wrong, as in the above case when the simulator fails.
+    Another typical use of the symbol is the output of a verifier to indicate rejection.
+\end{remark}
+
+The latter bounded-error alternative implies the former expected polynomial-time alternative, but not vice versa.
+The implication follows by repeatedly executing the bounded-error simulator until it succeeds.
+The difference is meaningful because there exist proof systems zero-knowledge with respect to the latter but not the former relaxation \cite{Gol01} page 205.
+Yet the latter alternative with strict polynomial time is preferred over the former alternative with expected polynomial-time because expected-polynomial time is not well understood compared to strict polynomial-time.
+For example, expected polynomial-time is not closed under composition.
+Regarding the subtleties of expected polynomial-time see \cite{Gol11}.
+
+Unlike the former relaxation, the latter relaxation is only meaningful for perfect zero-knowledge and has no affect in the context of statistical or computational zero-knowledge.
+If two distributions are statistically or computationally close, they remain so after a negligible error is applied to one of them, thus statistical and computational zero-knowledge are preserved when the simulator errs with negligible probability.
+
+
+\section{Zero-knowledge complexity classes}
+
+For every definition of zero-knowledge one may formulate the complexity class of all languages in which membership may be proved under that definition of zero-knowledge.
+
+\begin{definition}[ZK complexity classes]
+    The classes of languages with perfect, statistical, and computational zero-knowledge proof systems are denoted by $\cc{PZK}$, $\cc{SZK}$, and $\cc{CZK}$ respectively.
+    The generic notation $\cc{CZK}$ is taken to be an alias for $\cc{CZK}$ because computational zero-knowledge is the largest class.
+
+    The classes of languages with honest-verifier perfect, statistical, and computational zero-knowledge proof systems are denoted by $\cc{HPZK}$, $\cc{HSZK}$, and $\cc{HCZK}$ respectively.
+    The class $\cc{HZK}$ is an alias for $\cc{HCZK}$.
+
+    There is no particular notation for the classes of languages having relaxed forms of zero-knowledge proof systems.
+\end{definition}
+
+\begin{theorem}[Inclusion chain of ZK classes]
+    \begin{equation}
+        \cc{BPP} \in \cc{PZK} \in \cc{SZK} \in \cc{CZK} \in \cc{IP}
+    \end{equation}
+
+    \proof
+    The first inclusion $\cc{BPP} \in \cc{PZK}$ holds because $\cc{BPP}$ naturally has a perfect zero-knowledge proof system, namely that in which the prover is non-existent and the verifier attempts to compute the answer on its own with bounded soundness error.
+    The inclusions $\cc{PZK} \in \cc{SZK}$ and $\cc{SZK} \in \cc{CZK}$ clearly hold by the definitions of perfect, statistical, and computational indistinguishability of distribution ensembles.
+    The last inclusion $\cc{CZK} \in \cc{IP}$ because any non-trivial zero-knowledge proof system is an instance of an interactive proof system.
+\end{theorem}
+
+
+\begin{references}
+    \source{GK96}
+    \title{On the Composition of Zero-Knowledge Proof Systems}
+    \authors{Oded Goldreich}{H. Krawczyk}
+    \when{1990}
+    \where{SIAM J. Comput., Volume 25, pages 169-192}
+
+    \source{GO90}
+    \title{Definitions and properties of zero-knowledge proof systems}
+    \authors{Oded Goldreich}{Y. Oren}
+    \when{1990}
+    \where{Journal of Cryptology, Volume 7, pages 1-32}
+
+    \source{Gol01}
+    \title{Foundations of Cryptography: Volume 1, Basic Tools}
+    \authors{Oded Goldreich}
+    \when{2001}
+
+    \source{Gol11}
+    \title{Notes on Levin's Theory of Average-Case Complexity}
+    \authors{Oded Goldreich}
+    \when{2001}
+    \where{Studies in Complexity and Cryptography}
+
+    \source{GSV98}
+    \title{Honest-verifier statistical zero-knowledge equals general statistical zero-knowledge}
+    \authors{Oded Goldreich}{A. Sahai}{S. Vadhan}
+    \when{1998}
+    \where{STOC '98}
+\end{references}

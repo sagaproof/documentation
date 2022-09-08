@@ -1,0 +1,70 @@
+
+We mention two alternative notions to zero-knowledge that have been proposed in the literature.
+Upon discovering more we may summarize them as well.
+The first proposed is called `minimum disclosure proofs' introduced by \cite{BCC87}, and the second is `witness hiding proofs' introduced by \cite{FS90}.
+Both notions are weaker than zero-knowledge and while they both have their benefits, zero-knowledge remains the standard notion for prover privacy.
+
+
+\section{Minimum disclosure proofs}
+
+In the minimum disclosure model of \cite{BCC87}, the prover discloses nothing about the witness to the verifier.
+They call it `minimum' because the prover must still disclose whether or not the statement is true. 
+On the other side of the spectrum there's maximum disclosure proofs revealing the entire witness.
+For example, the prover simply handing the verifier the witness constitutes a valid maximum disclosure proof.
+It may seem that minimum disclosure meets the needs for privacy just as well as zero-knowledge, but for a subtle reason this may not be so.
+Minimum disclosure is a weaker notion than zero-knowledge because the prover may still reveal knowledge to verifier, just as long as this knowledge does not concern the witness.
+For example, the verifier may gain knowledge about a commitment scheme used throughout the proof by strategically querying the all-knowledgeable prover.
+More generally, it may not be known how to simulate the interaction with the prover, and the verifier may have gained knowledge through the interaction even when unclear what knowledge was gained.
+
+One may ask why zero-knowledge is the popular choice for privacy when minimum disclosure also ensures witness privacy.
+In fact, not only does minimum disclosure suffice for privacy, but it appears to be the tightest definition of privacy in that any proof system hiding the witness satisfies minimum disclosure, yet many such proof systems may not be fully simulatable and thus not satisfy zero-knowledge.
+Nevertheless, zero-knowledge remains the standard.
+Perhaps some proof systems wish to ensure the verifier gains nothing from interaction, even if irrelevant from the witness.
+More likely, however, is that the simulation-based definition of zero-knowledge guarantees zero knowledge is leaked, whereas the definition of minimum disclosure leaves one to determine exactly what knowledge might be leaked and whether or not such leakage is a problem.
+In fact, \cite{BCC87} do not even provide a formal definition of minimum disclosure.
+Or perhaps the reason is simply that zero-knowledge came first, and while overly cautious the definition has been successful enough that there is no need to seek a tighter definition like minimum disclosure.
+
+
+\section{Witness hiding proofs}
+
+Before introducing the notion of witness hiding, \cite{FS90} introduces the notion of witness indistinguishability.
+A proof system is witness indistinguishable when the verifier cannot distinguish which witness was used by the prover.
+Specifically, a proof system is witness indistinguishable if for any large enough instance, any verifier auxiliary input, and any two witnesses, the two views of the verifier (sequences of messages sent by the prover) corresponding to the two witnesses are indistinguishable.
+As with zero-knowledge, one may consider perfect, statistical, or computational indistinguishability.
+Witness indistinguishability is only nontrivial when there are multiple witnesses, which is often the case.
+
+A proof system is witness hiding when the verifier cannot learn the witness from the interaction.
+They prove that if a proof system is nontrivially witness indistinguishable then it is also witness hiding.
+It may seem that witness hiding meets the needs for privacy just as well as zero-knowledge, but for a subtle reason this may not be so.
+Witness hiding is a weaker notion than zero-knowledge because the verifier may learn part of the witness, just as long as the verifier doesn't learn the entire witness.
+For example, in the case of a one-way permutation the witness is unique and witness hiding guarantees nothing in this case.
+In fact, witness hiding is even weaker than minimum disclosure because any minimum disclosure implies witness hiding by the trivial fact that if the verifier learns nothing of the witness then the verifier certainly doesn't learn the whole witness.
+
+The core benefit of witness hiding proof systems, and probably the motivation behind them, is that they may be composed arbitrarily with other protocols without sacrificing security.
+This is not so with zero-knowledge.
+In particular, parallel composition is appropriate for witness hiding protocols but not for zero-knowledge protocols in general.
+An example of zero-knowledge failing in the setting of parallel composition is shown by \cite{FS90} as motivation for witness hiding.
+They construct a simple zero-knowledge proof system that when executed twice in parallel allows the verifier to use the messages of one prover as queries to the other prover in a way that extracts the entire witness.
+
+A notable use of witness indistinguishability beyond implying witness hiding is it's use in \cite{FLS90} for constructing zero-knowledge noninteractive proof systems that support a polynomial number of proofs with the same setup.
+Such are most proof systems used in practice, including the one's developed in this project, but they do not use the same technique as \cite{FLS90} or witness indistinguishability in general.
+
+\begin{references}
+    \source{BCC87}
+    \title{Minimum Disclosure Proofs of Knowledge}
+    \authors{G. Brassard}{D. Chaum}{C. Cr{\'e}peau}
+    \when{1987}
+    \where{J. Comput. Syst. Sci., Volume 37, pages 156-189}
+    
+    \source{FS90}
+    \title{Witness indistinguishable and witness hiding protocols}
+    \authors{U. Feige}{A. Shamir}
+    \when{1990}
+    \where{STOC '90}
+
+    \source{FLS90}
+    \title{Multiple non-interactive zero knowledge proofs based on a single random string}
+    \authors{U. Feige}{D. Lapidot}{A. Shamir}
+    \when{1990}
+    \where{Proceedings 31st Annual Symposium on Foundations of Computer Science, Volume 1, pages 308-317}
+\end{references}

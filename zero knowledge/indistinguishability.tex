@@ -1,0 +1,219 @@
+
+\begin{define}
+    \newcommand\ppt{\text{probabilistic polynomial-time}}
+\end{define}
+
+We explore the definitions of indistinguishability, in particular the indistinguishability of ensemble distributions.
+The word `ensemble' is intended to capture how the distributions are viewed together rather than individually, in the same way that a musical ensemble consists of musicians playing together rather than individually.
+There are three types of ensemble indistinguishability.
+The strongest type is perfectly indistinguishable ensembles.
+The second type, also considered strong, is statistically indistinguishable ensembles.
+The weakest type, dependent on intractability assumptions, is computationally indistinguishable ensembles.
+
+We begin by briefly introducing probability spaces and random variables, see details at \link[?]{exploration/theory/probability/...}.
+Here we only account for discrete probably distributions, that is where the number of possible outcomes is countable, whether finitely countable or infinitely countable.
+Then we introduce a statistical distance for measuring the similarity of distributions.
+Extending the notion of statistical distance to ensembles, we derive the three types of definitions for indistinguishable ensembles.
+
+
+\section{Probability definitions}
+
+A (discrete) \emph{probability space}, more often called a \emph{probability distribution} or just a \emph{distribution}, is a (countable) set of possible outcomes $\Omega$ called the \emph{sample space} paired with a function $p\colon\Omega\to[0,1]$ called the \emph{probability function}.
+The probability function assigns a probability to each output, and all probabilities sum to one.
+Any subset $E\in\Omega$ is called an \emph{event}, and the probability of the event occurring is $\sum_{e\in E} p(e)$.
+Often we abuse notation and denote the probability of the event by $p(E)$ or $\Pr[\text{describe}(E)]$ where $\text{describe}(E)$ is some informal specification of the subset $E$ and the probability function $p$ is left implicit.
+Thus all probabilities summing to one may be written as $p(\Omega)=1$ or $\Pr[\text{something occurs}]=1$.
+In the discrete case the probability function can be called a \emph{probability mass function} or \emph{distribution function} to reflect how it assigns fractional probabilities across a sample space, analogous to how a physical distribution function assigns fractional weights across a physical space.
+
+A (discrete) \emph{random variable} $R\colon A\to B$ is a function between sample spaces, or between distributions when the sample spaces are appropriately paired with probability functions.
+Given a probability function $p_A$ on $A$, the random variable $R$ induces a probability function $p_B$ on $B$.
+Specifically, we may use the natural definition $p_B(b) = \sum_{a\in R^{-1}(b)} p_A(a)$.
+Thus when the domain of a random variable is a distribution, the random variable turns the codomain into a distribution.
+Since a random variable gives rise to a new distribution, the random variable is naturally associated with the new distribution.
+Notation is often abused by identifying the random variable as the new distribution itself, for example by identifying $R$ as the distribution with sample space $B$ with probability function $p_B$.
+So often the words `distribution' and `random variable' are used synonymously when actually random variables are functions between distributions.
+
+\begin{remark}[Differences from the measure theoretic definition]
+    Typically a probability space is a triple consisting of a sample space, probability function, and additionally a set of sample space subsets called a $\sigma$-algebra.
+    These subsets are needed because the probability function may not be definable on the non-discrete sample spaces but only on certain subsets of the sample space.
+    In the discrete case, however, the probability function may be defined on the sample space directly forgoing the $\sigma$-algebra.
+\end{remark}
+
+Next we define ensembles in the context of probability.
+Often in complexity theory or cryptography, we wish to parameterize a random variable by a string or a number such as a security parameter.
+Such parameterization is usually done using ensembles consisting of an infinite sequence of random variables with each random variable corresponding to a parameter.
+In our context the random variable usually ranges of strings of a certain size relative to the parameter.
+If the parameter is a number or a string, the random variable ranges over strings of length polynomial in the number or the length of the string respectively.
+
+\begin{definition}[Distribution ensembles]
+    A \emph{distribution ensemble} (more names mentioned below) is a countably-infinite sequence of distributions or random variables presumably related in some way.
+    The notation is usually written as $\{X_i\}_{i\in I}$ or $\{X(i)\}_{i\in I}$ for some countable set $I$ with some implicit ordering on $I$ specifying the sequence.
+    Such a set $I$ is called an \emph{indexing set}.
+    Often $I$ is taken to be the set of natural numbers $\N$, and indeed all countable sets are isomorphic to $\N$.
+    Thought of another way, an ensemble is a stochastic process in which the indexing set is generalized beyond a time sequence.
+
+    Alternatives names include \emph{probability ensemble}, \emph{random variable ensemble}, or sometimes when clear from context just \emph{ensemble}.
+\end{definition}
+
+Since distribution ensembles are a natural generalization of distributions, we may naturally extend random variables from mapping between distributions to mapping between distribution ensembles.
+Usually the distributions in a distribution ensemble are all related in a natural way such that a single random variable can be applied to all of them. 
+For example, we will see below that an algorithm can thought of as a random variable applied to a distribution ensemble in which each distribution ranges over problems of a certain size.
+Given a distribution ensemble $\{X_n\}_{n\in\N}$ and a random variable $R$ that may be applied to each distribution, we may create the new distribution ensemble $\{R(X_n)\}_{n\in\N}$.
+In the case that a single random variable cannot be applied to all distributions, one may instead apply a random variable ensemble $\{R_n\}_{n\in\N}$ resulting in distribution ensemble $\{R_n(X_n)\}_{n\in\N}$.
+For example, such is the case if $R$ is a non-uniform algorithm.
+
+
+\section{Distribution Similarity}
+
+Given a sample space $S$, multiple probability functions may be defined on $S$, say $p_1$ and $p_2$, giving rise to multiple probability distributions.
+Since the distributions are defined on the same space, we may naturally compare them via the relative probabilities they assign to each outcome in the space.
+Of course, the two distributions are identical if and only if they assign the same probability to each outcome.
+In this case we say the statistical distance between them is zero.
+We now present the definition of statistical distance as a means for comparing the similarity of distributions.
+There are many definitions of statistical distance, but we focus on a certain one traditionally called `total variation distance' which is natural for probability distributions.
+
+\begin{definition}[Statistical distance between distributions]
+    Given two distributions $X$ and $Y$ defined on the same sample space $S$, with corresponding probability functions $p_X$ and $p_Y$.... rephrase
+
+    The \emph{statistical distance} between $X$ and $Y$ is defined as follows.
+    \begin{align}
+        \Delta(X,Y) \coloneqq \max_{E\subseteq S} \|p_X(E) - p_Y(E)\|
+    \end{align}
+    
+    For each event $E$ the distributions assign respective probabilities $p_X(E)$ and $p_Y(E)$.
+    The statistical difference is the maximum difference the two distributions assign to the same event.
+\end{definition}
+
+\begin{theorem}[An equivalent definition]
+    An equivalent definition for the case of discrete distributions is as follows.
+    \begin{align}
+         \Delta(X,Y) \coloneqq \|p_X(S) - p_Y(S)\|/2
+    \end{align}
+    This definition suffices for our purposes.
+
+    \proof
+    The event $E'\coloneq\{s\in S | p_X(s)\geq p_Y(s)\}$ is one of the events upon which $p_X$ and $p_Y$ show maximum difference, that is $\Delta(X,Y) = \|p_X(E') - p_Y(E')\|$.
+    To see this, note that for any other event $E''$ we have $p_X(E''\setminus E') < p_Y(E''\setminus E')$ by definition of $E'$.
+    Therefore
+    \begin{align}
+        \|p_X(E') - p_Y(E')\|
+        &\geq \|(p_X(E') - p_Y(E')) + (p_X(E''\setminus E') - p_Y(E''\setminus E'))\| \\
+        &= \|p_X(E'') - p_Y(E'')\|
+    \end{align}
+
+    We continue by noting the following equivalence.
+    \begin{align}
+        &p_X(S) = 1 = p_Y(S) \\
+        &\implies p_X(E') + p_X(S\setminus E') = p_Y(E') + p_Y(S\setminus E') \\
+        &\implies p_X(E') - p_Y(E') = p_Y(S\setminus E') - p_X(S\setminus E')
+    \end{align}
+    We now use the equivalence in the second equality below to transform the alternative definition into the original definition.
+    \begin{align}
+        &\|p_X(S) - p_Y(S)\|/2 \\
+        &= (p_X(E') - p_Y(E'))/2 + (p_Y(S\setminus E') - p_X(S\setminus E'))/2 \\
+        &= p_X(E') - p_Y(E') = \|p_X(E') - p_Y(E')\| \\
+        &= \max_{E\subseteq S} \|p_X(E) - p_Y(E)\|
+    \end{align}
+\end{theorem}
+
+
+\section{Indistinguishable ensembles}
+
+First we state the traditional definition of computational indistinguishability and then we present our own definition in terms of statistical distance and finally show the two definitions are equivalent.
+The traditional definitions of perfect and statistical indistinguishability are identical to ours.
+
+\begin{definition}[The typical definition]
+    Two distribution ensembles $\{X_n\}_{n\in N}$ are $\{Y_n\}_{n\in N}$ are \emph{computationally indistinguishable} if for every $\ppt$ distinguisher $D$ the following is a negligible function in $n$.
+    \begin{align}
+        \| \Pr{D(X_n)=1} - \Pr{D(Y_n)=1} \|
+    \end{align}
+    The probabilities are taken not just over the sampling of either $X_n$ or $Y_n$ but also over the internal coin tosses of $D$.
+\end{definition}
+
+We first briefly describe our three forms of indistinguishable distributions, and then we will extend to indistinguishable distribution ensembles.
+Two distributions are \emph{perfectly indistinguishable} if they are identical.
+Two distributions $X$ and $Y$ are \emph{statistically indistinguishable} with respect to security parameter $\lambda$ if their statistical distance is negligible, that is $\Delta(X,Y)\leq 1/2^\lambda$.
+Now regarding computational indistinguishability with respect to security parameter $\lambda$, suppose $X$ and $Y$ are two distributions defined on the same sample space $S$, and $U$ is the uniform distribution on $\{0,1\}^{\poly{\lambda}}$.
+The distributions $X$ and $Y$ are \emph{computationally indistinguishable} if for every polynomial-time computable random variable $D\colon S\times U\to\{0,1\}$ we have $\Delta(D(X,U),D(Y,U))\leq 1/2^\lambda$.
+In order to interpret $D$ as a distinguisher we restrict it to a binary output set such that we may interpret its output as pointing to either $X$ or $Y$.
+
+We now describe in more detail what we mean by an algorithm as a random variable, particularly in the context of ensembles.
+Whereas above we explicitly stated a security parameter $\lambda$, here the security parameter is implicitly taken to be the size of the problems.
+Suppose a randomized algorithm $A$ is defined on the problem sets $\{0,1\}^n$ for $n\in N$ and when receiving a problem of size $n$ it receives a random auxiliary input from $\{0,1\}^{\poly{n}}$.
+Therefore we may think of $A$ as a random variable defined on the sequence of sample spaces $\{ \{0,1\}^n\times\{0,1\}^{\poly{n}} \}_{n\in\N}$.
+Or rather, $A$ is a random variable defined on the distribution ensemble $\{ \{0,1\}^n\times\{0,1\}^{\poly{n}} \}_{n\in\N}$ in which each set $\{0,1\}^n$ is subject to some probability function for sampling problems, and each set $\{0,1\}^{\poly{n}}$ is subject to the uniform probability function.
+A $\ppt$ algorithm $A$ is the special case that the random variable is polynomial-time computable, meaning there exists a deterministic algorithm that given any input $(x,r)\in\{0,1\}^n\times\{0,1\}^{\poly{n}}$ computes $A(x,r)$ in time polynomial in $|(x,r)|$.
+We will treat a $\ppt$ distinguisher as such a random variable in our definition of computationally indistinguishable ensembles below.
+
+Now we state our three definitions of ensemble indistinguishability.
+\begin{definition}[Perfectly indistinguishable ensembles]
+    Two distribution ensembles $\{X_n\}_{n\in\N}$ and $\{Y_n\}_{n\in\N}$ are \emph{perfectly indistinguishable} if they are identical, that is $X_n = Y_n$ for all $n$.
+\end{definition}
+
+\begin{definition}[Statistically indistinguishable ensembles]
+    Two distribution ensembles $\{X_n\}_{n\in\N}$ and $\{Y_n\}_{n\in\N}$ are \emph{statistically indistinguishable} if the statistical distance between pairs of random variables is negligible for sufficiently large $n$.
+    In other words, $\Delta(X_n,Y_n)$ is a negligible function of $n$.
+\end{definition}
+
+\begin{definition}[Computationally indistinguishable ensembles]
+    Let $\{X_n\}_{n\in\N}$ and $\{Y_n\}_{n\in\N}$ be two distribution ensembles defined on the same sequence of sample spaces $\{S_n\}_{n\in\N}$.
+    Let $\{U_n\}_{n\in\N}$ be the distribution ensemble in which each $U_n$ is the uniform distribution over $\{0,1\}^{\poly{n}}$.
+    We may then create the sequence of sample spaces $\{S_n\times\{0,1\}^{\poly{n}}\}_{n\in N}$ upon which we have the two distribution ensembles $\{X_n\times U_n\}_{n\in N}$ and $\{Y_n\times U_n\}_{n\in N}$.
+
+    The ensembles $\{X_n\}_{n\in\N}$ and $\{Y_n\}_{n\in\N}$ are \emph{computationally indistinguishable} if for every polynomial-time computable random variable $D\colon S_n\times\{0,1\}^{\poly{n}}\to\{0,1\}$ (mapping from sample spaces $\{ S_n\times\{0,1\}^{\poly{n}} \}_{n\in\N}$ to some binary set such as $\{0,1\}$) the following two distribution ensembles are statistically indistinguishable.
+    \begin{align}
+        \{ D(X_n, U_{\poly{n}}) \}_{n\in\N}
+        \text{ and }
+        \{ D(Y_n, U_{\poly{n}}) \}_{n\in\N}
+    \end{align}
+\end{definition}
+
+Now we show the equivalence between the traditional definition and our latter definition.
+\begin{theorem}[Equivalence of the two definitions]
+    The traditional definition of computationally indistinguishable ensembles is equivalent to the definition directly above.
+
+    \proof
+    It is sufficient to show that $\Delta(D(X_n, U_{\poly{n}}),D(Y_n, U_{\poly{n}})$ is equivalent to $\| \Pr{D(X_n)=1} - \Pr{D(Y_n)=1} \|$ because then one is a negligible function of $n$ if only if the other is.
+
+    Let $p_X$ be the probability function corresponding to distribution $X_n\times U_{\poly{n}}$, and likewise $p_Y$ corresponding to $Y_n\times U_{\poly{n}}$.
+    \begin{align}
+        & \Delta(D(X_n, U_{\poly{n}}),D(Y_n, U_{\poly{n}})) \\
+        &= \frac{1}{2} \sum_{b\in\{0,1\}} \|p_X(D^{-1}(b)) - p_Y(D^{-1}(b))\| \\
+        &= \frac{1}{2} (
+            \| (1 - p_X(D^{-1}(1))) - (1 - p_Y(D^{-1}(1))) \| + \| p_X(D^{-1}(1)) - p_Y(D^{-1}(1)) \|
+            ) \\
+        &= \frac{1}{2} (
+            \| p_Y(D^{-1}(1)) - p_X(D^{-1}(1)) \| + \| p_X(D^{-1}(1)) - p_Y(D^{-1}(1)) \|
+            ) \\
+        &= \| p_X(D^{-1}(1)) - p_Y(D^{-1}(1)) \| \\
+        &= \| \Pr{D(X_n, U_{\poly{n}})=1} - \Pr{D(X_n, U_{\poly{n}})=1} \|
+    \end{align}
+    The last expression differs from the traditional definition in that the $\ppt$ distinguisher $D$ is randomized via a random auxiliary input from $U_{\poly{n}}$ rather than from internal coin tosses.
+    Yet these two forms of randomization are equivalent, completing the equivalence.
+\end{theorem}
+
+The above definitions refer to computational indistinguishability when the distinguisher only has a single sample to examine.
+If the distinguisher is able to generate many samples of both distributions on its own, or receive them from some oracle, indistinguishability under a single sample implies indistinguishability under many samples.
+We do not prove this here, but provide an idea how we may argue reducibility using what's called a `hybrid argument.'
+For $m=\poly{n}$ consider the $m+1$ distribution ensembles $\{(X_n^{(1)},\dots,X_n^{(k)}, Y_n^{(k+1)},\dots,Y_n^{(m)})\}_{n\in\N}$ for $0\leq k\leq m$.
+Ensemble $k=0$ is $\{(X_n^{(1)},\dots,X_n^{(m)})\}_{n\in\N}$ and ensemble $k=m$ is $\{(Y_n^{(1)},\dots,Y_n^{(m)})\}_{n\in\N}$.
+If one can distinguish between ensembles $0$ and $m$, and one can construct all intermediate ensembles, then there must exist an index $0\leq k<m$ such that one can distinguish between neighboring ensembles $k$ and $k+1$.
+Distinguishing between neighboring ensembles $k$ and $k+1$ entails distinguishing between each of their distributions, including distribution $k+1$ which is either $Y_n^{(k+1)}$ or $X_n^{(k+1)}$ respectively.
+Thus the ability to distinguish under $m=\poly{n}$ samples implies the ability to distinguish under $1$ sample.
+The contrapositive means indistinguishability under one sample implies indistinguishability under $\poly{n}$ samples.
+See a proof in \cite{Gol01} page 108.
+
+% what about ZK? 
+% prover dist maybe not efficienly constructable.
+% whe do we even need under multiple samples?
+% We note that in the case of zero-knowledge simulation, both the proof and the simulation 
+% for simulation only need one sample cuz of aux
+
+% When an ensemble is indistinguishable from a uniform ensemble we call it \emph{pseudo-random}.
+
+\begin{references}
+    \source{Gol01}
+    \title{Foundations of Cryptography: Volume 1, Basic Tools}
+    \authors{Oded Goldreich}
+    \when{2001}
+\end{references}

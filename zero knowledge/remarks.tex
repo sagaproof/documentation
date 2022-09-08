@@ -1,0 +1,52 @@
+
+\begin{remark}[The term `zero-knowledge' and its use in this project]
+    The term `zero-knowledge' is often used as a broad identifier for probabilistic proof systems, which are systems for proving statements with theoretically impossible features at the price of probabilistic correctness.
+    In the `crypto' community the term has become trendy and used for branding privacy and scaling solutions.
+    A probabilistic proof system is zero-knowledge when it features privacy. 
+    Some probabilistic proof systems are appropriately labeled 'zero-knowledge' because privacy is their primary feature.
+    For example, the purpose of \link[Zcash]{z.cash} is to offer Bitcoin users an option for private transactions, and other concerns such as additional costs incurred are of secondary importance.
+    Many other probabilistic proof systems, however, are less appropriately labeled `zero-knowledge' because privacy is \emph{not} their primary feature.
+    For example, an effort towards standardization of probabilistic proof systems bears the name `ZKProof Standards' along with the website name `zkproof.org', both of which use the convenient two-letter acronym `ZK' (for `zero-knowledge') as a broad identifier for all probabilistic proof systems. 
+    Terms like `zero-knowledge proof systems', `zero-knowledge proofs', `ZK proofs', and `ZKPs' have become all-encompassing expressions for the probabilistic proof systems used throughout the crypto community.
+    Such terms have been stretched to be all-encompassing likely because they are convenient, and also because zero-knowledge was the primary focus of the 1980's paper \cite{GMR85} that introduced probabilistic proof systems and coined the term `zero-knowledge.'
+
+    In contrast to the generic use of the term `zero-knowledge' as described above, within this project we refer to generic probabilistic proof systems as `proof systems', omitting the modifier `probabilistic' because proof systems with guaranteed correctness allow for no `magic' so are of little use for our purposes.
+    We only describe a proof system as `zero-knowledge', or prepend the prefix `ZK', when discussion is oriented towards privacy.
+    Indeed, this entire directory is labeled 'zero-knowledge proofs' because it focuses only on the privacy features of proof systems.
+\end{remark}
+
+\begin{remark}[The zero of zero-knowledge]
+    Zero-knowledge does not require that the proof yields \emph{nothing} useful to the verifier.
+    If that were the case, the proof would be useless.
+    Rather, zero-knowledge requires that the proof yields nothing useful \emph{beyond convincing evidence for the statement}.
+    Assuming the verifier is unable to arrive at convincing evidence on its own, convincing evidence from the prover is a form of knowledge.
+    Zero-knowledge denotes zero with respect to knowledge beyond the validity of the statement, not zero with respect to all knowledge.
+\end{remark}
+
+\begin{remark}[Zero-knowledge through simulation]
+    Knowledge is information that is useful for computation.
+    For example, a bit-string representing a satisfying assignment to a certain boolean circuit may be useful.
+    On the other hand, a bit-string representing the outcomes of coin tosses may not be useful.
+    In the context of proof systems we are interested in the verifier's knowledge and how it changes before and after the proof.
+    Zero-knowledge means the verifier's knowledge remains the same before and after the proof, that is the verifier gains zero knowledge through the proof regardless how the proof is communicated, whether interactively or non-interactively.
+    For example, suppose the prover reveals a bit-string to the verifier.
+    If the bit-string represents a satisfying assignment to a certain boolean circuit, the verifier has gained knowledge if that satisfying assignment was not previously known to the verifier.
+    On the other hand, if the bit-string represents coin tosses, the verifier has not gained knowledge because the verifier could have tossed the coins itself without any help from the prover.
+
+    The notion of knowledge as useful information is difficult to define precisely.
+    With no precise definition of knowledge, the quantification of knowledge (known as \emph{knowledge complexity}) is also difficult to define.
+    Due to lack of any natural and convenient way to define and quantify knowledge, zero-knowledge has always been defined in a conservative manner that avoids the need for any precise notions regarding knowledge.
+    It may seem ironic that we can define a quantity of knowledge, namely zero knowledge, without any quantification system for knowledge.
+    But the quantity zero is special and different from any other quantity.
+    The nature of any non-zero quantity varies with the quantification system, but the nature of zero (in essence, `nothing') remains invariant regardless of the quantification system.
+    Thus we may define the quantity zero-knowledge without having in mind any quantification system for knowledge.
+
+    To guarantee that the prover shares zero knowledge with the verifier, we require that whatever the prover shares with the verifier could have been generated by the verifier itself with no access to the prover.
+    How do we define `whatever' the prover shares with the verifier, and once defined what does it mean for the verifier to `generate' it?
+    Roughly, every prover gives rise to a family of random variables describing the proofs or some function of the proofs, such as a function the verifier may wish to compute when given a proof.
+    We require that the verifier \emph{simulate} the family of random variables to the extent that sampling from the verifier's simulated random variables is indistinguishable from sampling from the prover's real random variables.
+    In other words, every prover gives rise to a distribution ensemble, and we require the verifier to simulate a fake distribution ensemble indistinguishable from the real one.
+    There are varying degrees of indistinguishability giving rise to different degrees of zero-knowledge security.
+    The two distribution ensembles may be identical, statistically close, or computationally close, resulting is perfect zero-knowledge, statistical (or almost perfect) zero-knowledge, or computational zero-knowledge respectively.
+    By convention, the unqualified definition of zero-knowledge is taken to be computational zero-knowledge.
+\end{remark}
