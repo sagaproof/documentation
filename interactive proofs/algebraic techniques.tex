@@ -1,0 +1,61 @@
+
+All proof systems used in practice today use algebraic techniques.
+In contrast, many of the early constructed proof systems and even many theoretically-oriented proofs systems constructed today, rely on combinatorial techniques instead.
+The first proof system that appears to have employed algebraic techniques is \cite{FKLN92}, and the paper was appropriately titled `Algebraic Methods for Interactive Proof Systems.'
+
+The methods used in both the proof by \cite{Sha92} that $\cc{IP}=\cc{PSPACE}$ and the proof by \cite{BFL91} that $\cc{MIP}=\cc{NEXP}$ rely on the algebraic techniques developed in \cite{FKLN92}.
+The purpose of \cite{FKLN92} is constructing a proof system for the $\#\cc{P}$-complete problem of computing the permanent of a square binary matrix.
+We mention that every language in the polynomial-time hierarchy, that is the complexity class PH, is reducible to the class $\#\cc{P}$, and therefore the proof system of \cite{FKLN92} suffices for all languages in PH, that is $\cc{PH}\subseteq\cc{IP}$.
+
+The techniques of \cite{FKLN92} involve representing the permanent via a multivariate polynomial.
+Using a polynomial to represent the permanent was a previous idea used in \cite{Val79} to prove the average-case hardness of computing the permanent.
+It is worth mentioning that the permanent of a matrix is related to the determinant of a matrix, and both only make sense for square matrices.
+Yet the permanent is much harder to computer than the determinant, and as quoted by \cite{Val79},
+\begin{quote}
+    We do not know of any pair of functions, other than the permanent and determinant, for which the explicit algebraic expressions are so similar, and yet the computational complexities are apparently so different.
+    
+    Leslie Valiant from \cite{Val79}
+\end{quote}
+
+The core contribution of \cite{FKLN92}, exploited by subsequent papers, is an implicit technique to probabilistically reduce verifying two evaluations of any low-degree polynomial to verifying only one evaluation.
+To see the idea explicitly for the special case of low-degree multivariate polynomials representing permanents, consult \cite{FKLN92} Lemma 4.
+With this technique in hand, they apply it numerous times in a recursive fashion to achieve an efficient proof system for $\#\cc{P}$.
+
+Subsequent papers extracted the implicit techniques of \cite{FKLN92} and refined the ideas.
+The work \cite{Sha92} modified the methods to work for quantified boolean formulas which characterize PSPACE, thus showing every language in PSPACE has an interactive proof.
+Independently, \cite{BF91} also built upon the work of \cite{FKLN92} to construct proof systems similar to that of \cite{Sha92}.
+But the proof systems in \cite{BF91} basically served as arithmetic-oriented approaches to proving membership in $\#\cc{P}$ and some other languages, and didn't reach as far as PSPACE.
+Yet the authors soon followed up with another work \cite{BFL91} to show every language in NEXP has a multi-prover interactive proof.
+The techniques employed by all these works came to be referred to as `arithmetization' techniques because they used arithmetic for representations.
+Furthermore, they arithmetic theorems to prove properties of these representations.
+
+If we are to glean the core contributions of the series of works in the preceding paragraph as far as proof systems are concerned (rather than complexity theory), we settle on two related protocols that we believe also serve as illustrations for the ideas contained in those works.
+The first protocol reduces verifying two evaluations of a low-degree polynomial to verifying one evaluation.
+The second protocol recursively invoked the first protocol to reduce verifying the sum of many evaluations of a low-degree polynomial to verifying a single evaluation.
+The second protocol has come to be known as the `sumcheck' protocol, though this name was not used in any of the works above.
+These two techniques are described in \link[statement reduction]{}.
+While we do not describe them here, we briefly describe how the sumcheck protocol can be used as a proof system for $\#\cc{P}$, in particular as a proof system for counting the number of satisfying assignments to a boolean circuit.
+Suppose the circuit has $n$ variables.
+We may arithmetize the circuit into a polynomial $f\colon\Z^n\to\Z$, leaving us to count the number of boolean inputs that yield output $1$.
+That is, we must count the size of the set $|\{ f(x) | x\in\{0,1\}^n \}|$, which is equal to $\sum_{x\in\{0,1\}^n} f(x)$.
+Using the sumcheck protocol we can reduce verifying this sum to verifying the evaluation of $f$ at some random input $r\in\Z^n$.
+
+\begin{references}
+    \source{BF91}
+    \title{Arithmetization: A new method in structural complexity theory}
+    \authors{L. Babai}{L. Fortnow}
+    \when{1991}
+    \where{Computational Complexity, Volume 1, pages 41-66}
+
+    \source{BFL91}
+    \title{Non-deterministic exponential time has two-prover interactive protocols}
+    \authors{L. Babai}{L. Fortnow}{Carsten Lund}
+    \when{1991}
+    \where{Computational Complexity, Volume 1, pages 3-40}
+
+    \source{Val79}
+    \title{The Complexity of Computing the Permanent}
+    \authors{L. Valiant}
+    \when{1979}
+    \where{Theor. Comput. Sci., Volume 8, pages 189-201}
+\end{references}

@@ -1,0 +1,43 @@
+
+\begin{remark}
+    \bold{Interaction notation}
+
+    The interaction of two machines, such as a prover $P$ and a verifier $V$ with their respective inputs, is given special notation.
+    While the notation applies to any two interacting machines, we note it was developed for the purpose of an interacting prover and verifier.
+    The purpose of the notation is to succinctly capture the outcome of the interaction in a way that can be inserted into probability equations and such.
+    In fact, there are two outcomes of the interaction, those are the two outputs of the two interacting machines.
+    The notation puts the two machines between angled brackets to represents the output of the machine on the right.
+    In order to represent the output of the machine on the left, positions must be swapped.
+    Thus the notation is asymmetric.
+
+    For example, the output of the verifier after interaction is denoted $\langle P(\cdot),V(\cdot)\rangle$, and a proper verifier $V$ should presumably always output a boolean answer indicating acceptance or rejection.
+    The output of the prover after interaction is denoted $\langle V(\cdot),P(\cdot)\rangle$, but the prover's output is seldom considered.
+
+    A formal definition of interacting machines in terms of Turing machines that communicate using various tapes can be found elsewhere such as in the original zero-knowledge paper \cite{GMR85}.
+\end{remark}
+
+\begin{remark}
+    \bold{Terms for interaction complexity}
+
+    Different terms are used throughout the literature to capture the number of messages exchanged in an interactive proof.
+    The first word used in the early versions of \cite{GMR85} was `turn'.
+    While \cite{Bab85} also used the word `turn' a few times, the word `move' (like a player's move in a game) was used far more.
+    Consensus within the community then moved towards yet another word, `round'.
+    But the word `round' is ambiguous on whether it means unidirectional interaction where one machine sends a message to the other, or bidirectional interaction where the receiving machines sends back a message in response.
+    The bidirectional version makes more sense given the name `round' but both versions have been used.
+\end{remark}
+
+\begin{remark}
+    \bold{Statements as set memberships}
+    
+    In any proof system there is some type of statement to be proven, and the instance of the statement varies with the instance of the proof.
+    Statements can be expressed in many forms, and every proof system must adopt a convention to express the types of statements it supports.
+    Since proof systems were developed within the complexity theoretic community, the complexity theoretic notion of \emph{membership in a language} is the common convention, and the default convention used in this project.
+    A language is a set (in terms of set theory) of items presumably related in some way.
+    Items are usually expressed as \emph{strings}, which are sequences of character symbols, such as bit-strings which are sequences of the digits zero and one.
+    One may say a string $x$ belongs to a language $L$, similarly to how a word may belong to a natural language.
+    To make such a statement, one asserts set membership of $x$ in $L$ as $x\in L$.
+    If the statement $x\in L$ is false, we write $x\notin L$.
+    All statements to be proven are taken to be such statements of language membership unless indicated otherwise.
+    We say a proof system is `for a language $L$' or `for a set $L$' if the statements to be proved are statements of membership in $L$.
+\end{remark}

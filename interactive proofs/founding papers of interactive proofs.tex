@@ -1,0 +1,237 @@
+
+In this project we are interested only in proof systems of probabilistic correctness because guaranteed correctness leaves no opportunity for the features we seek.
+Thus by `proof systems' we mean `probabilistic proof systems.'
+
+
+\section{Introduction}
+
+Two works are usually regarded as the primary founding papers of (probabilistic) proof systems.
+The first paper is by Goldwasser, Micali, and Rackoff \cite{GMR85} and doesn't have a precise publishing date because early versions of the paper circulated as early as 1982, but it was rejected from major journals three times before being accepted into \emph{STOC'85} more than a decade later \cite{Gol02}.
+The second paper is by Babai \cite{Bab85} and appeared in 1985 and was in fact presented at the same conference (\emph{STOC'85}) as \cite{GMR85}. The two works were independently created, but given their simultaneous publishing and related topics each work cited the other.
+
+We note that \cite{GMR85} was also the founding paper of the concept of zero-knowledge, more generally knowledge complexity.
+After introducing interacting proofs, \cite{GMR85} took a natural next step and considered how much knowledge a proving process reveals to the verifier beyond the validity of the statement.
+The concept of knowledge complexity, however, can be examined separately and we do not examine it here.
+
+The two works independently define their own basic tools, proof systems employing these tools, and complexity classes describing languages in terms of these proof systems.
+The resulting proof systems and complexity classes carry both similarities and differences.
+A subsequent paper \cite{GS86} proved the complexity classes are in fact equivalent.
+
+
+\section{The framework of \cite{GMR85}}
+
+\subsection{Basic Tools}
+
+The tools defined in \cite{GMR85} are pairs of interactive Turing machines.
+Both machines read the same input tape.
+Each machine has two private tapes, a random tape for reading, and a work tape for reading and writing.
+Additionally there are two tapes for communication between the machines.
+Each communication tape facilitates communication in one direction by one machine writing to it and the other reading from it.
+They contrast this model of communicating Turing machines with the model for the traditional NP proving process in which the random tapes are nonexistent and there is only one communication tape from the prover to the verifier.
+
+\subsection{Proof systems}
+
+To convert a pair of interactive Turing machines into a proof system for a language $L$, \cite{GMR85} treats one machine as the prover and the other as the verifier and enforces the following conditions.
+\begin{itemize}
+
+    \item{Unbounded prover}
+    The prover has unbounded computational resources.
+
+    \item{Bounded verifier}
+    The verifier is bounded by polynomial time.
+
+    \item{Completeness}
+    For every $x\in L$, the verifier halts and accepts with probability at least $1-1/p(|x|)$ for all polynomials $p$.
+
+    \item{Soundness}
+    For every $x\notin L$, the verifier halts and accepts with probability at most $1/p(|x|)$ for all polynomials $p$.
+
+\end{itemize}
+In this case we say $L$ \emph{has} a proof system.
+
+\subsection{Complexity classes}
+
+With a definition of proof systems in hand, \cite{GMR85} defines induced complexity classes.
+They define the complexity class \emph{Interactive Polynomial-time}, denoted IP, as containing all languages that have a proof system as previously defined.
+Any such proof system is referred to as an interactive proof system.
+The authors believe the number of messages exchanged between the two machines, capturing the amount of interaction required, is the primary metric for efficiency.
+In light of this they further partition IP into subclasses according to how the amount of interaction grows with the input size.
+The class $\cc{IP}[t(\cdot)]$ for $t\colon\N\to\N$ comprises languages having a proof system with the exchange of $t(|x|)$ messages on instance $x$.
+To make this precise, \cite{GMR85} assumes the verifier sends the first message.
+
+
+\section{The framework of \cite{Bab85}}
+
+\subsection{Basic Tools}
+
+The tools defined in \cite{Bab85} are \emph{Arthur vs. Merlin games} or Arthur-Merlin games.
+Arthur-Merlin games are a special case of \emph{Games against Nature} from \cite{Pap84}.
+A Game against Nature, in turn, is a special case of a more general game involving two players on a common input that sequentially exchange an prespecified number of messages, and at the end a deterministic polynomial time Turing machine views all moves taken and declares a winner.
+A Game against Nature is when one of the players, called Nature, is indifferent to winning and on each move simply sends a random message.
+An Arthur-Merlin game is a Game against Nature in which Arthur plays the role of Nature and for any input the probability of Merlin winning is bounded away from one-half in one direction or the other (e.g. probability less than $1/3$ or greater than $2/3$).
+The purpose of the latter condition will become apparent when using Arthur-Merlin games as proof systems.
+
+\subsection{Proof systems}
+
+While Arthur-Merlin games may seem irrelevant to proof systems they may in fact serve as proof systems.
+The prover can be identified with the powerful wizard Merlin, appropriately so in that Arthur-Merlin games impose no computational restrictions on Merlin.
+The verifier can be identified as the machine that makes the random moves of Arthur and then invokes the deciding Turing machine at the end.
+Thus the verifier is restricted to only asking random questions and once all answers are received to making a decision in deterministic polynomial time.
+If we invoke this proof system on a language containing exactly those strings on which Merlin wins with probability more than half, then the final condition of Arthur-Merlin games promises notions of completeness and soundness analogous to those of \cite{GMR85}.
+In order to guarantee completeness and soundness, Arthur-Merlin proof systems are appropriate for exactly such languages.
+It may seem backwards that we first define Arthur-Merlin proof systems and then seek appropriate languages, but this is an artifact of how \cite{Bab85} organizes definitions.
+In practice we first define languages and then seek appropriate Arthur-Merlin proof systems.
+Either way, the same pairs of languages and proof systems exist.
+
+\subsection{Complexity classes}
+
+With Arthur-Merlin games in hand, \cite{Bab85} defines induced complexity classes.
+Every Arthur-Merlin game induces a language consisting of all inputs for which Merlin succeeds with probability above one half. 
+Thus we may define sets of languages, that is complexity classes, by defining sets of Arthur-Merlin games.
+Suppose we partition Arthur-Merlin games by which player moves first and also by how many moves take place.
+Let $t\colon\N\to\N$ be a function of game input lengths. 
+For games where Arthur moves first and there are $t(\cdot)$ moves, denote the corresponding complexity class by $\cc{AM}[t(\cdot)]$.
+For games where Merlin moves first and there are $t(\cdot)$ moves, denote the corresponding complexity class by $\cc{MA}[t(\cdot)]$.
+In the case that there are a constant number of moves, we may omit the brackets and instead expand the capital string to indicate the sequence of moves.
+For example, the complexity classes induced by single-move games may be denoted A and M, two-move games AM and MA, three-move games AMA and MAM, etc.
+
+
+\section{Similarities}
+
+Both forms of (probabilistic) proof systems rely crucially on \emph{interaction}, in particular non-trivial interaction beyond the prover simply sending the verifier a proof.
+The interaction of \cite{GMR85} takes place via interacting Turing machines, while the interaction of \cite{Bab85} takes place via a game and a sequence of moves between two parties.
+All proof systems that have followed these works (including MIPs, PCPs, NIZKs) still employ some form of non-trivial interaction, even if the verifier only interacts once with the prover.
+
+Both forms of proof systems employ a randomized verifier.
+In contrast, verifiers for the NP proof system are deterministic.
+The need for verifier randomization is equally important to the need for verifier interaction.
+In fact, in most proof systems including all those explored in this project, the randomization and interaction of the verifier can be thought of as the same.
+They are the same in that all randomness is only used in interaction, and all interaction only uses randomness.
+This is how verifiers function in the proof systems of \cite{Bab85}, whereas verifiers function more freely in the proof systems of \cite{GMR85}.
+
+In both forms of proof systems the prover has unbounded computational resources and the verifier is restricted to probabilistic polynomial time (and \cite{Bab85} further restricts exactly how the randomness is used).
+It seems both papers arrived at this asymmetric formulation for the same reasons.
+If the prover were restricted, the prover could not prove many statements otherwise provable.
+If the verifier were unrestricted, the verifier could prove many statements to itself with no need for a prover.
+Both works intend to capture the theoretical power of interactive proof systems with no intention for practicality.
+Works that follow, such as this project, narrow focus to proof systems with probabilistic polynomial time provers.
+
+
+\section{Differences}
+
+The primary difference between the proof systems of \cite{Bab85} and \cite{GMR85} arises due to the already mentioned difference of how \cite{Bab85} restricts the verifier's use of randomness.
+The verifier of \cite{GMR85} has a private random tape and may thus hide randomness from the prover.
+The verifier of \cite{Bab85}, on the other hand, only may use the randomness of Arthur all of which is sent to the prover.
+A useful analogy is drawn by \cite{Bab85} wherein interactive proofs from \cite{GMR85} are card games (in which cards may be private) and interactive proofs from \cite{Bab85} are chess games (in which all moves are public).
+Interactive proofs with private randomness are qualified as `private coin' whereas those with public randomness are qualified as `public coin'.
+
+The notation of complexity classes also differs between the two works.
+The two notations $\cc{IP}[t(\cdot)]$ and $\cc{AM}[t(\cdot)]$ (and $\cc{MA}[t(\cdot)]$) are similar in that they both involve brackets indicating the number of messages exchanged.
+But when we omit the brackets they suddenly carry contrasting meanings.
+IP captures languages with interactive proofs of any polynomial number of messages, while AM (and MA) captures languages with interactive proofs of only two messages.
+Thus with brackets omitted IP allows a maximum number of bidirectional messages, while AM (and MA) allows a minimum number of bidirectional messages.
+
+We also mention that the completeness and soundness probabilities are presented differently but they are effectively equivalent.
+The error probabilities in \cite{GMR85} are required to be negligible, whereas the error probabilities in \cite{GMR85} may not be negligible but they are formulated such that they will become negligible upon repeating the protocol any non-constant polynomial number of times.
+
+
+\section{Analysis and equivalence}
+
+The complexity classes formulated by \cite{Bab85} are more amenable to analysis than those of \cite{GMR85} due to the public coin restriction \cite{Bab85} imposes on the verifier.
+While \cite{GMR85} provides no analysis of the complexity classes $\cc{IP}[\cdot]$, \cite{Bab85} makes several trivial and nontrivial observations about $\cc{AM}[\cdot]$ and $\cc{MA}[\cdot]$.
+Many papers followed making further observations about these classes and their relationships to each other and to other classes.
+
+Trivially, \cite{Bab85} notes A = BPP and M = NP.
+To see why A = BPP, see that Arthur tosses coins and Merlin sends nothing, so a deterministic polynomial time machine is left to decide membership only with the help of Arthur's coins.
+To see why M = NP, see that Merlin sends the equivalent of an NP witness and Arthur sends nothing, so a deterministic polynomial time machine is left to decide membership only with the help of Merlin's witness.
+It is also trivial to note the inclusion relation relative to the number of messages exchanged which holds for the IP classes as well.
+In particular, if a language has a proof system with $k$ messages exchanged then it also has a proof system with $k'>k$messages exchanged where the additional messages are empty.
+Extending the inclusion relation by concatenating moves also at the beginning of the game we have
+\begin{align}
+    \cc{AM}[k]\cup\cc{MA}[k] \sube \cc{AM}[k+1]\cap\cc{MA}[k+1]
+\end{align}
+
+Nontrivially, \cite{Bab85} proves that an MA game can be simulated by an AM game with only a polynomial increase in the total size of messages sent, and thus any constant length game can be simulated by a single AM game.
+Reversing the moves of an MA game to obtain an AM game lets Merlin adaptively choose his message after learning the randomness of Arthur which is problematic for soundness.
+To overcome this bias in Merlin's message, \cite{Bab85} plays the AM game many times in parallel requiring Merlin to reply the same to each.
+The result is a single AM game with polynomially larger messages.
+One may then take any Arthur-Merlin game and make a constant number of MA to AM swaps and then merge adjacent A's and M's all while maintaining polynomial message sizes.
+Consequently all finite levels of the hierarchy above AM collapse down to AM, that is for any constant $k$
+\begin{align}
+    \cc{AM}[k] = \cc{AM}[2]
+\end{align}
+Unbounded levels of the hierarchy specified by any non-constant polynomial, however, are not known to collapse.
+
+Following \cite{GMR85} and \cite{Bab85}, \cite{GS86} proves that private coin interactive proofs can be simulated by public coin interactive proofs with the same number of messages but with one additional message sent from Merlin to Arthur at the beginning.
+In particular for any polynomial $t$ they prove
+\begin{align}
+    \cc{IP}[t(\cdot)] \sube \cc{MA}[t(\cdot)+1] \sube \cc{AM}[t(\cdot)+2]
+\end{align}
+Combined with the collapsing theorem of \cite{Bab85} one may collapse the additional two messages of the AM game into the polynomial $t$.
+Combining further with the trivial fact that proof systems from \cite{Bab85} are special cases of proof systems from \cite{GMR85} we obtain the equality
+\begin{align}
+    \cc{IP}[t(\cdot)] = \cc{AM}[t(\cdot)]
+\end{align}
+Thus the two forms of proof systems have equal power for proving statements, and private verifier randomness provides no additional power over public verifier randomness.
+We warn, however, that this does not immediately imply equivalence with respect to any feature of proof systems (e.g. zero-knowledge).
+
+The power of interactive proofs was well underestimated in these early days.
+An early extended abstract of \cite{GMR85} conjectured that AM is a strict subset of $\cc{IP}[2]$, and that the IP hierarchy doesn't collapse, that is $\cc{IP}[k]$ is a strict subset of $\cc{IP}[k+1]$.
+Given the above equivalence and collapsing theorem, both of these conjectures turned out to be false as $\cc{AM} = \cc{IP}[2]$ and the finite IP hierarchy collapses.
+On the other hand, \cite{Bab85} describes the family of languages having Arthur-Merlin proof systems as "just above NP" believing it is not much larger than NP, and such belief was not unique to \cite{Bab85}.
+The Arthur-Merlin games were inspired by the Games against Nature of \cite{Pap84} with the added constraint that winning and losing probabilities against Nature are bounded away from one-half.
+Though \cite{Pap84} showed Games against Nature characterize PSPACE, \cite{Bab85} believed Arthur-Merlin games characterize a much smaller complexity class.
+In particular, \cite{Bab85} believed that even coNP could not exist within $\cc{AM}[\poly(\cdot)]$, but later \cite{FKLN92} proved to the contrary that $\cc{coNP} \sube \cc{IP} = \cc{AM}[\poly(\cdot)]$.
+Ultimately it was proven by \cite{Sha92} that interactive proof systems characterize PSPACE.
+In other words, languages with interactive proof systems are equivalent to languages computable in polynomial space, that is
+\begin{align}
+    PSPACE = \cc{IP} = \cc{AM}[\poly(\cdot)]
+\end{align}
+This result highlights how interactive proof systems are believed to be much more powerful than NP proof systems.
+
+
+\section{Motivations and results}
+
+The founding works \cite{GMR85} and \cite{Bab85} each arrive at interactive proof systems by their own motivations and each arrive at their own corresponding results.
+In \cite{GMR85} attention is drawn to interactive proof systems because they seem efficient by intuition and because they offer the ability to prove statements in zero-knowledge in contrast to previous nontrivial proving systems.
+They construct zero-knowledge interactive proofs for quadratic residuosity and quadratic nonresiduosity.
+If it were not for these zero-knowledge proofs the paper would not have presented anything about interactive proof systems provably superior to previous proof systems.
+We also note that the zero-knowledge proofs they present rely on a non-deterministic prover and thus do not suffice for efficient protocols.
+In \cite{Bab85} attention is drawn to interactive proof systems because they allow proving certain statements from group theory either not known to be provable in the NP proof system or rather complex to prove in the NP proof system.
+In particular, the problems are deciding membership and non-membership in a group and deciding order and non-order of a group when groups are matrix groups represented by generating sets.
+A particular version of the membership problem (4 by 4 integral matrices) is even known to be undecidable, and yet \cite{Bab85} shows it may be proven probabilistically via interactive proofs.
+
+Each work also comments philosophically on the significance of interactive proofs.
+The authors of \cite{GMR85} emphasize the interactivity, contrasting how NP proofs are analogous to those that can be "written down in a book," whereas interactive proofs are analogous to those that can be "explained in class."
+A proof written down in a book must answer all possible questions, whereas a proof explained in class must only answer questions as they arise.
+The author of \cite{Bab85} emphasizes randomness, saying "a random string can sometimes replace the most formidable mathematical hypothesis" and recalling how randomness often radically simplifies solutions, the classic example being primality testing.
+The philosophy of \cite{Bab85} is contained in its title, "Trading group theory for randomness," referring to a trade off that statements not easily proven via group theory can be easily proven via randomness if one is willing to trade complete soundness for statistical soundness.
+Lastly, we note that the class AM has evidence for being a natural class.
+As \cite{Bab85} points out, one may prove AM relates to NP in the same naturally relativized way that BPP relates to P.
+In particular, for a random oracle $O$ (meaning for almost every oracle $O$ in a measure-theoretic sense)
+\begin{align}
+    \cc{BPP} = \cc{P}^O \text{ and } \cc{AM} = \cc{NP}^O
+\end{align}
+Thus AM might be thought of as a probabilistic version of NP in the same way BPP is a probabilistic version of P.
+At the same time, MA might also be thought of as a probabilistic version of NP in which the NP verifier may use randomness.
+Perhaps both AM and MA are indeed deserving of the name "just above NP."
+
+\begin{references}
+    \source{Gol02}
+    \title{Zero-Knowledge twenty years after its invention}
+    \authors{Oded Goldreich}
+    \when{2002}
+    \where{IACR Cryptol. ePrint Arch. page 186}
+
+    \source{GS86}
+    \title{Private coins versus public coins in interactive proof systems}
+    \authors{S. Goldwasser}{M. Sipser}
+    \when{1986}
+    \where{Adv. Comput. Res.}
+
+    \source{Pap84}
+    \title{Games against Nature}
+    \authors{C. Papadimitriou}
+    \when{1986}
+    \where{Journal of Computer and System Sciences, Volume 31, pages 288-301}
+\end{references}

@@ -1,0 +1,111 @@
+
+The work of \cite{GS86} proves the two founding forms of proof systems are equivalent in that anything provable in one is provable in the other
+The two forms of proof system were introduced independently by \cite{GMR85} and \cite{Bab85} with the primary difference that the verifiers of \cite{GMR85} may hide private randomness from the prover, while the verifiers of \cite{Bab85} must reveal all randomness to the prover.
+Proof systems allowing private verifier randomness are referred to as private-coin proof systems, and those not allowing it as public-coin proof systems.
+One may immediately observe that any public-coin proof system is a private-coin proof system in which no randomness in hidden.
+Conversely, the paper proves that any private-coin proof system can be simulated and thus replaced by a public-coin proof system with roughly the same efficiency.
+
+% Around the time of \cite{GS86} another paper \cite{GMW91} presented zero-knowledge proof systems for all of NP and also for graph non-isomorphism which is believed to be outside NP.
+% % This was an exciting result because it implied 
+% % Crucially, \cite{GMW91} relied on private verifier randomness 
+
+
+% Arthur makes first null move, so actually only one additional round
+
+% they say not clear if public-coins ok for zk in IP, maybe only assuming owfs
+
+% this transformation too relies on power of prover
+
+
+
+\section{Simulating private-coin with public-coin}
+
+For ease of notation we borrow from \cite{Bab85} and refer to the public-coin verifier and prover as $A$ and $M$ for Arthur and Merlin respectively.
+We warn the reader not to confuse this notation with that for the complexity classes of \cite{Bab85}.
+The prover $M$ and verifier $A$ of the public-coin protocol simulate the prover $P$ and verifier $V$ of the private-coin protocol.
+In effect $M$ proves to $A$ that $P$ could have proven the original statement to $V$.
+
+Suppose we assume $P$ is deterministic by always using the optimal strategy to convince $V$.
+Suppose we fix the statement to be proven thus leaving the whole protocol, including all messages sent therein and the final decision, a deterministic function of the private randomness of $V$.
+In other words, for every (private) random input string of $V$ a unique protocol ensues.
+The probability of $P$ convincing $V$ is equal to the fraction of the random strings inducing protocols that result in acceptance.
+We wish for $M$ to prove to $A$ that the set of random strings resulting in acceptance is adequately large.
+First we introduce a tree structure to describe this set in terms of smaller sets.
+Second we describe the core subprotocol of \cite{GS86} and outline how it is used to recursively prove the size of sets in terms of smaller sets.
+Last we cover crucial details omitted in the outline.
+
+\subsection{The acceptance tree}
+
+Build a tree structure to represent all possible message paths (sequences of messages) that $V$ may take resulting in acceptance.
+Each edge can be identified with a message from $V$ and each vertex can be identified with the unique message path leading to it from the root.
+We also identify each vertex with a unique set of random strings.
+Specifically, a random string $r$ is in the set identified with a vertex $v$ if and only if the message path of $V$passes through $v$ when $V$ uses $r$ as its random input.
+The root vertex corresponds to the empty path and thus to the set of all random strings resulting in acceptance.
+It is this set which $M$ must prove to $A$ has adequate size, and we refer to it as the root set.
+Each leaf vertex corresponds to a message path resulting in acceptance and thus to the set of all random strings inducing this acceptance path.
+We refer to sets associated with leaf vertices as leaf sets.
+For all instances of parent and children vertices we refer to their associated sets as parent and children sets.
+
+One may observe that each parent set is the union of the children sets, and furthermore the children sets are a partition of the parent set.
+The partition relationship exists between parent and children sets because each random string induces a unique message path, so no random string in a given parent set can be inherited by more than one child set.
+Due to the partition relationship the size of any parent set can be measured as the sum of the sizes of its children sets.
+
+The statement to be proven in the public-coin protocol is a lower bound on the size of the root set.
+To measure the root set, we could recursively measure all child sets.
+Summing the size of all leaf sets, however, seems to require many more messages to be exchanged than in the private-coin protocol.
+To keep the number of messages in the public-coin protocol roughly the same, the technique of \cite{GS86} proceeds differently by approximating a lower bound on the size of the root set.
+
+\subsection{Protocol outline}
+
+Before outlining the protocol we introduce the core subprotocol of \cite{GS86} in slightly abused form for the sake of simplicity.
+The subprotocol reduces proving a lower bound on the size of a subset $\sigma$ (of some superset) to proving membership in $\sigma$.
+The verifier randomly chooses another subset $\rho$ in which the verifier can efficiently check membership.
+The size of $\rho$ should be proportional to the size of $\sigma$ (so the prover may need to send auxiliary information to help the verifier select a size for $\rho$).
+Upon receiving $\rho$ from the verifier, the prover should be able to find with high probability an element $x$ belonging to both $\rho$ and $\sigma$ if and only if $|\sigma|$ meets the claimed lower bound.
+Upon receiving $x$ from the prover, the verifier efficiently checks membership of $x$ in $\rho$.
+Thus we have reduce to proving membership of $x$ in $\sigma$.
+The verifier accepts the claimed lower bound on $|\sigma|$ if and only if both memberships hold.
+In \cite{GS86} the random set is chosen as the preimage of a random target set with respect to a random hash function, such that verifying membership entails efficiently hashing and examining the output with respect to the target set.
+
+Using this subprotocol, \cite{GS86} reduces proving lower bounds on the size of any non-leaf set (such as the root set) to proving lower bounds on the size of a child set.
+We proceed recursively from the root set to a child set, continuing until reaching a leaf set, at which point we invoke the suprotocol again to prove a lower bound on the leaf set.
+For simplicity we focus on an arbitrary non-leaf set $\Sigma$.
+To prove a lower bound on $|\Sigma|$ we prove that at least $\texttt{count}_\Sigma$ children sets have size at least $\texttt{size}_\Sigma$.
+Let $\sigma_\Sigma$ be the subset of children sets each of size at least $\texttt{size}_\Sigma$.
+We wish for $M$ to prove to $A$ that $|\sigma_\Sigma|\geq\texttt{count}_\Sigma$, thus proving the lower bound $|\Sigma|\geq\texttt{count}_\Sigma\times\texttt{size}_\Sigma$.
+Using the subprotocol, $A$ sends a random challenge to $M$ and $M$ replies with a child set $x$ leaving $A$ to verify $x\in\sigma_\Sigma$, that is $|x|\geq\texttt{size}_\Sigma$.
+If $x$ is not a leaf set we proceed recursively as above proving the lower bound on $|x|$.
+If $x$ is a leaf set we invoke the subprotocol again to reduce verifying the lower bound on $|x|$ to verifying membership in $x$.
+Since $x$ is a leaf set consisting of arbitrary random strings, any string may be accepted as a member of $x$.
+
+\subsection{Omitted details}
+
+The protocol outline above omits crucial details and oversimplifies perhaps to the point of confusion.
+The prover $M$ doesn't send child sets as said, but instead sends pairs of messages.
+The first is the next message $V$ would have sent, and the second is the next message $P$ would have sent in response.
+The message from $V$ serves as an identifier for the child set, and the subprotocol actually hashes the message rather than the associated child set.
+The message from $P$ is not used immediately by $A$ but is saved and accumulated into a transcript with all other messages between $P$ and $V$.
+When $M$ finally sends the random string in the leaf set, $A$ saves it as the random input for $V$.
+To decide whether to accept or reject the statement, $A$ delegates the decision to $V$ by invoking it on the original statement, the saved random input, and the message transcript.
+
+This public-coin protocol is indeed a simulation of the private-coin protocol because every interaction of $A$ and $M$ simulates an interaction of $P$ and $A$.
+Specifically, every time $A$ sends a challenge $M$ replies with a question and answer pair from $V$ and $P$.
+Actually $M$ also replies with some auxiliary information concerning how $A$ should select its next challenge (in particular how large the random set $\rho$ should be).
+The need for $M$ to send auxiliary information for $A$ to select its next challenge explains why the public-coin simulation requires an extra message at the beginning from $M$.
+In order to be consistent in having the verifier send the first message, we may say $A$ sends an initial empty message followed by the auxiliary information from $M$.
+In this case the public-coin protocol has two more messages than the private-coin protocol.
+
+
+The work of \cite{GS86} also presents a variant of Turing machines that characterize the same languages as public-coin proof systems.
+They refer to the machines as probabilistic, nondeterministic, polynomial time Turing machines because they run in polynomial time and may select the next configuration either deterministically or nondeterministically in one of two ways.
+The first way is choosing the next configuration randomly, analogous to a verifier sending a random message.
+The second way is choosing the next configuration to maximize the probability of acceptance, analogous to a prover sending an optimal response.
+
+\begin{references}
+    \source{GS86}
+    \title{Private coins versus public coins in interactive proof systems}
+    \authors{S. Goldwasser}{M. Sipser}
+    \when{1986}
+    \where{Adv. Comput. Res., Volume 5, pages 73-90}
+
+\end{references}

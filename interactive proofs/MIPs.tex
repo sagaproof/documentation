@@ -1,0 +1,183 @@
+
+Multi-prover interactive proofs (MIPs) introduced by \cite{BGKW88} are a modification of the original form of interactive proofs introduced by \cite{GMR85}.
+Instead of a single all-powerful prover there are multiple all-powerful provers who may not communicate during the protocol.
+If a language has a multi-prover interactive proof it is in the complexity class MIP.
+Regular interactive proofs are a special case of multi-prover interactive proofs, so $\cc{IP}\subseteq\cc{MIP}$.
+This containment is believed to be strict because allowing multiple provers seems to significantly increase the power of the proof systems as far as what languages can be proven.
+Specifically, analogous to how \cite{Sha92} proved that $\cc{IP}=\cc{PSPACE}$, later \cite{BFL91} proved that $\cc{MIP}=\cc{NEXP}$, and indeed the containment $\cc{PSPACE}\subseteq\cc{NEXP}$ is believed to be strict.
+
+
+\section{Motivation}
+
+The motivation of \cite{BGKW88} for introducing MIPs was to find an efficient proof system for NP with perfect zero-knowledge.
+Perfect zero-knowledge with unbounded provers leaves no room for error in that the prover uses the optimal strategy and the verifier learns nothing in the information-theoretic sense. 
+These properties were exploited in \cite{For87} to show if a language can be proven with an unbounded verifier in perfect zero-knowledge, then so can its complement language.
+From this \cite{For87} concludes that NP must have no perfect zero-knowledge proof system, and indeed regular interactive proof systems for NP with perfect zero-knowledge are only known to exist assuming a computationally bounded prover.
+
+Wishing to avoid intractability assumptions regarding the proving party, \cite{BGKW88} sought alternative assumptions regarding the proving party.
+The alternative assumption put forth by \cite{BGKW88} is that multiple independent provers assist the verifier.
+By independent we mean the provers do not communicate among each other during the proving process, because if they did they would effectively become a single prover.
+While the work of \cite{BGKW88} does indeed achieve its goal of presenting an efficient proof system for NP with perfect zero-knowledge, the notion of MIPs in and of itself was a major contribution inspiring much subsequent research.
+
+
+\section{Additional Results}
+
+In addition to introducing MIPs and showing it suffices for perfect zero-knowledge for NP, \cite{BGKW88} makes two additional important observations.
+Other works followed proving further observations.
+
+The first observation is that more than two provers are unnecessary.
+\begin{theorem}[Two provers are sufficient for MIPs \cite{BGKW88}]
+    As proven in \cite{BGKW88} any $k$ provers can be replaced by just two provers.
+
+    \proof
+    Instead of interacting with the $k$ provers the verifier interacts with two provers as follows.
+    \begin{enumerate}
+        \item
+        The verifier sends all its coins to the first prover and asks for the transcript of what would have occurred if it had interacted with the $k$ provers using these coins.
+        The transcript consists of $k$ sub-transcripts, sub-transcript $i\in[k]$ being the transcript between the prover $i$ and the verifier.
+        \item
+        The first prover replies with a potentially erroneous transcript.
+        If the transcript is correct then the verifier can make a correct decision based on whether or not it would have accepted had it interacted with the $k$ provers.
+        But the first prover may have sent an erroneous transcript, so the verifier interacts with the second prover to determine if this is so.
+        \item
+        For each $i\in[k]$ the verifier interacts with the second prover executing the protocol it would have executed with prover $i$.
+        But instead of executing the subprotocols in some predetermined order the verifier randomizes their order.
+        Upon completing each interaction the verifier compares the transcript of the interaction with the relevant sub-transcript sent from the first prover, expecting them to match.
+        If the verifier ever encounters a mismatch it rejects.
+        Otherwise the verifier accepts.
+    \end{enumerate}
+    Completeness evidently holds.
+    Soundness holds because at if the original verifier would have rejected then at least one of the sub-transcript sent by the first verifier is erroneous.
+    The second verifier must match the erroneous sub-transcript by using the same erroneous strategy when interacting with the verifier.
+    But there are many possible erroneous strategies and without seeing the verifier's coins the second prover doesn't know which erroneous strategy the first prover chose.
+    With noticeable probability the second prover will use a strategy different than the first prover and the verifier will catch the mismatch.
+    Upon executing the protocol many times the soundness error can be reduced until negligible.
+\end{theorem}
+
+The second observation is that the provers may employ an optimal strategy to achieve perfect completeness.
+If the instance is indeed in the language as claimed, then regardless what questions the verifier asks, the provers are able to succeed in proving membership.
+Perfect completeness for MIPs is analogous to perfect completeness for IPs proved by \cite{FGM+89}.
+
+We mention a third additional result proved subsequently by a series of papers culminating in \cite{FL92}.
+Analogous to how the IP hierarchy generated by the number of rounds collapses, so does the MIP hierarchy.
+But the MIP hierarchy collapses in a stronger sense than the IP hierarchy.
+In the case of IP any proof system with a constant number of rounds may be replaced by a proof system with a single round.
+In the case of MIP any proof system with a polynomial number of rounds may be replaced by a proof system with a single round.
+
+Many other additional questions and results regarding multi-prover interactive proofs have been explored but they are beyond our scope.
+For example, it is natural to ask about public vs private coin MIPs, but there is no natural way to even define exactly what a public-coin proof would mean in the multi-prover setting.
+The verifier cannot reveal all its coins to both provers or else soundness is compromised.
+The verifier might not be able to partition its coins and send part to one prover and the rest to the other because a single coin may well determine questions to both provers.
+Somehow the verifier must reveal all of its randomness but sharing with each prover precisely the randomness used to determine questions for that prover.
+Another unanswered question is in regard to the parallel composition of MIPs.
+Lastly, a natural question with a known answer is in regard to zero-knowledge, and indeed all of MIP can be proven in zero-knowledge \cite{FK94}.
+
+
+\section{MIP = NEXP}
+
+In \cite{FRS88} it is proven that any language having a multi-prover interactive proof system must be computable in nondeterministic exponential time, that is $\cc{MIP}\subseteq\cc{NEXP}$.
+Soon following, \cite{BFL91} proved that every language computable in nondeterministic exponential time has a multi-prover interactive proof system, that is $\cc{NEXP}\subseteq\cc{MIP}$.
+Therefore $\cc{MIP}=\cc{NEXP}$.
+
+Due to the equivalence of MIP and NEXP it is worth thinking about the nature of NEXP.
+The complexity class NEXP can be thought of relative to NP which characterizes languages computable in nondeterministic polynomial time.
+Analogous to how we may interpret NP as the set of languages verifiable in polynomial time with polynomial size witnesses, so may we interpret NEXP as the set of languages verifiable in exponential time with exponential size witnesses.
+In fact, since our context is proof systems, these alternative definitions are more fitting than the traditional definitions.
+But we must remember that these proof system characterizations of NP and NEXP are not interactive except trivially in that the prover sends a static proof and the verifier verifies.
+The verifier never sends anything to the prover, which is essential in all types of interactive proof systems.
+
+If we treat the complexity class P as the set of languages efficiently computable (rather than BPP), then noting that the containment $\cc{P}\subseteq\cc{NEXP}$ is known to be strict, this is the first time that languages not efficiently computable may be efficiently verified.
+In other words, languages not computable in polynomial time can be verified (probabilistically) in polynomial time.
+But since the verification is probabilistic, perhaps it is more fitting to allow the computation to be probabilistic, in which case we are left with the containment $\cc{BPP}\subseteq\cc{NEXP}$ which is not known to be strict.
+The holy grail of such computation vs verification asymmetry is the P vs NP problem.
+
+
+\section{The power of physical separation}
+
+A multi-prover interactive proof system has the same setup as a regular interactive proof system except there are multiple provers and they are forbidden from communicating while proving.
+The physical separation of the provers is an assumption that allows for even more powerful results than assuming a computationally bounded prover.
+These two types of assumptions, limited communication vs limited computation, are of very different character.
+It is interesting to think about how the traditional assumptions of limited computation underlying cryptography could be exchanged for assumptions of limited communication.
+We comment on this at the end.
+
+A natural analogy between MIPs and real life is illustrated by the case of criminal suspects physically separated for interrogation.
+To quote the original paper \cite{BGKW88} of MIPs on this analogy,
+\begin{quote}
+    One may think of this as the process of checking the alibi of two suspects of a crime (who have worked long and hard to prepare a joint alibi), where the suspects are the provers and the verifier is the interrogator.
+\end{quote}
+Indeed, just as two suspects may conspire before interrogation, so may the provers conspire before the proving process begins, that is before the verifier asks its first question.
+Since the provers are computationally unbounded, they may have a plan on how to answer every possible set of questions the verifier may pose them.
+But the verifier is still able to catch them if they lie because the verifier asks the provers related questions that must be answered in conjunction if the answer is to be a believable lie.
+Since the provers are separated they are unable to answer in conjunction and must choose their answers independently.
+We mention that neither the number of questions the verifier asks nor the order in which the verifier queries the provers must be secret and in fact such secrecy adds nothing.
+Therefore asynchronous communication models among the provers and verifier are unneeded and a synchronous communication model suffices.
+In the case of interrogation, analogously, the suspects are likely aware in which room the interrogator is currently located.
+
+The type of cross-examination that takes place in MIPs is not exactly the kind that takes place in an interrogation.
+In an interrogation the suspects are often treated homogeneously, such as in the beginning when they may each be asked to tell their version of the story.
+Multi-prover proof systems, on the other hand, usually treat the provers inhomogeneously, such as one prover doing the majority of the work and a second prover answering questions to confirm the validity of the first prover's work.
+For example, to test a function $f$ for linearity we may select two inputs $\alpha$ and $\beta$ at random, ask the first prover for $f(\alpha)$ and $f(\beta)$, ask the second prover for $f(\alpha+\beta)$, and confirm the first prover's answers are correct by comparing via linearity with the second prover's answer.
+In this case the first prover does twice the work of the second prover.
+
+The power of physical separation has been extended further using quantum computing.
+In particular, MIPs in the quantum setting are applicable to languages beyond NEXP.
+In the quantum setting the provers are all-powerful quantum computers that may share an entangled state but are otherwise prohibited from communicating.
+Exploration in this direction culminated in \cite{JNV+20}, showing that the set of languages provable by such quantum provers is equal to the set of languages recognizable in a finite amount of time.
+An example is the undecidable halting problem because if a program ever stops it stops after a finite amount of time.
+Clearly physical separation is a powerful assumption.
+
+Lastly we comment that the possibility of replacing intractability assumptions with physical separation assumptions in practice is exciting, but we currently do not know how to enforce physical separation.
+When two provers are aware of each other it seems hopeless to prevent them from communicating by some means.
+Another approach is to choose the provers such that they are not aware of each other.
+But in what case would two provers wish to prove the same statement and yet be unaware of each other?
+Even if at the beginning they were unaware of each other, they could use the identity of the statement being proven as a means to locate each other.
+
+\begin{references}
+    \source{BFL91}
+    \title{Non-deterministic exponential time has two-prover interactive protocols}
+    \authors{L. Babai}{L. Fortnow}{Carsten Lund}
+    \when{1991}
+    \where{Computational Complexity, Volume 1, pages 3-40}
+
+    \source{BGKW88}
+    \title{Multi-prover interactive proofs: how to remove intractability assumptions}
+    \authors{M. Ben-Or}{S. Goldwasser}{J. Kilian}{A. Wigderson}
+    \when{1988}
+    \where{Providing Sound Foundations for Cryptography}
+
+    \source{FGM+89}
+    \title{On Completeness and Soundness in Interactive Proof Systems}
+    \authors{M. F{\"u}rer}{Oded Goldreich}{Y. Mansour}{M. Sipser}{S. Zachos}
+    \when{1989}
+    \where{Adv. Comput. Res., Volume 5, pages 429-442}
+
+    \source{FK94}
+    \title{Two prover protocols: low error at affordable rates}
+    \authors{U. Feige}{J. Kilian}
+    \when{1994}
+    \where{STOC '94}
+
+    \source{FL92}
+    \title{Two-prover one-round proof systems: their power and their problems (extended abstract)}
+    \authors{U. Feige}{L. Lov{\'a}sz}
+    \when{1992}
+    \where{STOC '92}
+
+    \source{For87}
+    \title{The complexity of perfect zero-knowledge}
+    \authors{L. Fortnow}
+    \when{1987}
+    \where{STOC '87}
+
+    \source{FRS88}
+    \title{On the Power of Multi-Prover Interactive Protocols}
+    \authors{L. Fortnow}{J. Rompel}{M. Sipser}
+    \when{1988}
+    \where{Theor. Comput. Sci.}
+
+    \source{JNV+20}
+    \title{Mip*=re}
+    \authors{Zheng-Feng Ji}{Anand Natarajan}{T. Vidick}{J. Wright}{H. Yuen}
+    \when{2020}
+    \where{ArXiv abs/2001.04383}
+\end{references}
