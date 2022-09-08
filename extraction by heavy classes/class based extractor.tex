@@ -105,25 +105,25 @@ The probability $\Valid$ outputs $1$ is precisely the probability the prover pas
 
 The second assumption we must prove is with respect to clashing, that is an upper bound on the probability $\ClashExt((C,\omega),(C',\omega'))=1$ for any $(C,\omega)\in(\C,\Omega)$ and $(C',\omega')\leftarrow(\C,\Omega)$.
 By the definition of $\ClashExt$ this occurs only when $\Clash(C_\iota,C'_\iota)=1$ so we conclude
-\begin{gathered}
-    \Pr[
+\begin{align}
+    &\Pr[
         \ClashExt((C,\omega),(C',\omega'))
         | (C,\omega)\in(\C,\Omega), (C',\omega')\leftarrow(\C,\Omega)
-    ]
-    = \Pr[
+    ] \\
+    &= \Pr[
         \Clash(C_\iota,C'_\iota)
         | C\in\C, C'\leftarrow\C, \omega\in\Omega, \omega'\leftarrow\Omega
-    ]
-    = \Pr[
+    ] \\
+    &= \Pr[
         \Clash(C_\iota,C'_\iota)
         | C\in\C, C'\leftarrow\C
-    ]
-    = \Pr[
+    ] \\
+    &= \Pr[
         \Clash(C_\iota,C'_\iota)
         | C_\iota\in\C_\iota, C'_\iota\leftarrow\C_\iota
-    ]
-    \leq \rho
-\end{gathered}
+    ] \\
+    &\leq \rho
+\end{align}
 
 We now construct our promised output using the promised output of the heavy class extractor.
 The heavy class extractor returns $(C,\omega)$ and $(C',\omega')$ in the same equivalence class of $(\C,\Omega)/\sim$ such that both are valid with respect to $\Valid$ and they do not clash with respect to $\ClashExt$, that is
